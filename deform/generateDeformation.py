@@ -64,7 +64,7 @@ def generateDeformation(Source_Type, x, y, Quake, Dyke, Sill, Mogi, Penny, Headi
 
     # Calculate displacements
     if Source_Type in [1, 2, 3]:
-        print(f"Model: {model}")
+        # print(f"Model: {model}")
         U, flag = disloc3d4(model, coords, lambda_, mu)
         xgrid = U[0, :].reshape(len(y), len(x))
         ygrid = U[1, :].reshape(len(y), len(x))

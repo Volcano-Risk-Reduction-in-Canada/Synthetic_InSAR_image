@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 # Settings
 SAVEWRAP = 0
 # outputRoot = "G:/VolcanicUnrest/Atmosphere/synthesised_patches/"
-outputRoot = "C:/Users/arothera/GitHub/Synthetic_InSAR_image/deform/set/"
+outputRoot = "C:/Users/arothera/GitHub/Synthetic_InSAR_image/set"
 os.makedirs(f"{outputRoot}/set1/unwrap/deform/", exist_ok=True)
 os.makedirs(f"{outputRoot}/set2/unwrap/deform/", exist_ok=True)
 
@@ -22,7 +22,7 @@ if SAVEWRAP == 1:
     os.makedirs(f"{outputRoot}/set2/wrap/deform/", exist_ok=True)
 
 halfcrop = 227 // 2
-Source_Type = 1
+Source_Type = 5
 
 # Source Parameters
 Quake = {
@@ -72,15 +72,23 @@ if Source_Type == 1:
                             Quake["Top_depth"] = Top_depth
                             allName = f"Type{Source_Type}_strike{Strike}_dip{Dip}_rake{Rake}_length{Length:.1f}_bdepth{Bottom_depth}_tdepth{Top_depth:.1f}"
                             if count < maxnum:
-                                print(allName)
+                                # print(allName)
                                 _, los_grid = generateDeformation(Source_Type, x, y, Quake, Dyke, Sill, Mogi, Penny, 192.04, 23)
                                 los_grid = los_grid / 0.028333 * 2 * np.pi
                                 los_grid = los_grid[len(los_grid)//2 - halfcrop:len(los_grid)//2 + halfcrop, len(los_grid)//2 - halfcrop:len(los_grid)//2 + halfcrop]
-                                print(np.ptp(los_grid))
-                                if 12 < np.ptp(los_grid) < 80:
-                                    outputDirUnwrap = f"{outputRoot}/set{2 - count % 2}/unwrap/deform/"
+                                print(f'Range: {np.ptp(los_grid)}')
+                                if 12 < np.ptp(los_grid) < 8000:
+                                    outputDirUnwrap = f"{outputRoot}/set{2 - count % 2}/unwrapdeform/"
                                     print(f"outputDir: {outputDirUnwrap}")
                                     os.makedirs(outputDirUnwrap, exist_ok=True)
+                                    plt.figure()
+                                    plt.imshow(los_grid / 0.028333 * 2 * np.pi - np.pi, extent=[x[0] / 1000, x[-1] / 1000, y[0] / 1000, y[-1] / 1000], cmap='jet')
+                                    plt.colorbar(label='radians')
+                                    # plt.title(f'Wrapped Simulation (Heading: {Heading})')
+                                    plt.xlabel('Easting (km)')
+                                    plt.ylabel('Northing (km)')
+                                    plt.axis('image')
+                                    plt.show()
                                     np.save(f"{outputDirUnwrap}{allName}.npy", los_grid)
                                     count += 1
 

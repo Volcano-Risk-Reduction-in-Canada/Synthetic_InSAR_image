@@ -1,4 +1,5 @@
 import numpy as np
+from Q import Q
 
 def intgr(r, fi, psi, h, Wt, t):
     """
@@ -38,9 +39,3 @@ def intgr(r, fi, psi, h, Wt, t):
                                      h * fi * Q(h, t, r[i, j], 8)))
 
     return Uz, Ur
-
-def Q(h, t, r, n):
-    """
-    Placeholder function for Q(h, t, r, n). Implement this function based on its definition in MATLAB.
-    """
-    raise NotImplementedError("Q function needs to be implemented.")

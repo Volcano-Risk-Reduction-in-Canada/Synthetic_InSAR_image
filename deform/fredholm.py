@@ -51,13 +51,3 @@ def fredholm(h, m, er=1e-7):
         psi1 = psi.copy()
 
     return fi, psi, t, Wt
-
-# Placeholder for the fpkernel function (you need to implement this based on your MATLAB code).
-# def fpkernel(h, ti, t, flag):
-#     # Implement the logic of fpkernel based on the MATLAB version
-#     return np.zeros_like(t)
-
-# # Placeholder for RtWt function (if it's defined elsewhere, include its logic here).
-# def RtWt():
-#     # Define Root and Weight values here
-#     pass
