@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from generate_deformation import generateDeformation
+from generateDeformation import generateDeformation
 
 # Script to produce simulated interferograms
 # Define Source Type
