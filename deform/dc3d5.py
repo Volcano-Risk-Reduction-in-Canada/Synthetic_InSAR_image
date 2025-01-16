@@ -93,7 +93,7 @@ def dc3d5(alpha, x, y, dip, al1, al2, aw1, aw2, disl1, disl2, disl3):
             qy = q * (1 / (c2_r * (c2_r + et)))
 
             # Strike-slip contribution
-            if disl1 != F0:
+            if np.any(disl1 != F0):
                 du2 = np.zeros((3, nx))
                 du2[0, :] = -xi * qy - c0_alp3 * ai1 * c0_sd
                 du2[1, :] = -q / c2_r + c0_alp3 * c2_y / rd * c0_sd
@@ -101,7 +101,7 @@ def dc3d5(alpha, x, y, dip, al1, al2, aw1, aw2, disl1, disl2, disl3):
                 dub += (disl1 / PI2) * du2
 
             # Dip-slip contribution
-            if disl2 != F0:
+            if np.any(disl2 != F0):
                 du2 = np.zeros((3, nx))
                 du2[0, :] = -q / c2_r + c0_alp3 * ai3 * c0_sdcd
                 du2[1, :] = -et * qx - c0_alp3 * xi / rd * c0_sdcd
@@ -109,7 +109,7 @@ def dc3d5(alpha, x, y, dip, al1, al2, aw1, aw2, disl1, disl2, disl3):
                 dub += (disl2 / PI2) * du2
 
             # Tensile contribution
-            if disl3 != F0:
+            if np.any(disl3 != F0):
                 du2 = np.zeros((3, nx))
                 du2[0, :] = q * qy - c0_alp3 * ai3 * c0_sdsd
                 du2[1, :] = q * qx + c0_alp3 * xi / rd * c0_sdsd

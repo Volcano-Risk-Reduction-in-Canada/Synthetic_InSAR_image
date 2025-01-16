@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from phase_colormap import phase_colormap
 from generateDeformation import generateDeformation
 
 # Script to produce simulated interferograms
@@ -10,7 +11,7 @@ from generateDeformation import generateDeformation
 # 4 = Point Pressure Source (Mogi) - Magma Chamber
 # 5 = Pressurized Penny-shaped Horizontal Crack (Fialko) - Sill
 
-Source_Type = 4
+Source_Type = 5
 
 # Define Source Parameters
 Quake = {
@@ -55,7 +56,7 @@ for Heading in values:
 
     # Plot interferograms
     plt.figure()
-    plt.imshow(los_grid_wrap / 0.028333 * 2 * np.pi - np.pi, extent=[x[0] / 1000, x[-1] / 1000, y[0] / 1000, y[-1] / 1000], cmap='jet')
+    plt.imshow(los_grid_wrap / 0.028333 * 2 * np.pi - np.pi, extent=[x[0] / 1000, x[-1] / 1000, y[0] / 1000, y[-1] / 1000], cmap=phase_colormap())
     plt.colorbar(label='radians')
     plt.title(f'Wrapped Simulation (Heading: {Heading})')
     plt.xlabel('Easting (km)')

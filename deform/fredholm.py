@@ -7,11 +7,8 @@ def fredholm(h, m, er=1e-7):
     # Constants and initial setup
     lamda = 2 / np.pi
 
-    # Assume `Root` and `Weight` are predefined as they were not defined in the original script.
-    # You may need to provide these or replace them with appropriate values.
-    Root = np.array([])  # Define the actual roots
-    Weight = np.array([])  # Define the actual weights
-
+    Root, Weight = RtWt()
+    
     NumLegendreTerms = len(Root)
     t = np.zeros(m * NumLegendreTerms)
     Wt = np.zeros_like(t)
