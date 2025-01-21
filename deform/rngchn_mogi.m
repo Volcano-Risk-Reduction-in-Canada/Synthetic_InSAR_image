@@ -44,7 +44,7 @@ function [del_rng]=rngchn_mogi(n1,e1,depth,del_v,ning,eing,v,plook);
 %    Poisson's ration v (tjw nov 09)
 dsp_coef=1000000*del_v*(1-v)/pi;
 
-if(mm == 1 & n == 1)
+if(mm == 1 && n == 1)
   disp('Calculating a matrix of rngchg values')
   del_rng=zeros(m,nn);
   del_d=del_rng;
@@ -68,7 +68,7 @@ if(mm == 1 & n == 1)
     del_rng(:,i_loop)=[e_disp(:,i_loop),n_disp(:,i_loop),...
                        del_f(:,i_loop)]*plook';
   end
-elseif ((mm == 1 & m == 1) | (n ==1 & nn == 1))
+elseif ((mm == 1 && m == 1) || (n ==1 && nn == 1))
   if (n ~= nn)
     error('Coord vectors not equal length!')
   end

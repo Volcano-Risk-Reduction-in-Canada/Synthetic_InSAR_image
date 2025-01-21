@@ -11,22 +11,31 @@ from generateDeformation import generateDeformation
 # 4 = Point Pressure Source (Mogi) - Magma Chamber
 # 5 = Pressurized Penny-shaped Horizontal Crack (Fialko) - Sill
 
-Source_Type = 5
+Source_Type = 2
 
 # Define Source Parameters
 Quake = {
-    "Strike": 25, "Dip": 80, "Rake": -90, "Slip": 1,
-    "Top_depth": 1, "Bottom_depth": 10, "Length": 10
+    "Strike": 25,                # strike in degrees [0-180]
+    "Dip": 80,                   # dip in degrees (usually 90 or near 90)
+    "Rake": -90,                 # 
+    "Slip": 1,
+    "Top_depth": 1,
+    "Bottom_depth": 10,
+    "Length": 10
 }
 
 Dyke = {
-    "Strike": 0, "Dip": 90, "Opening": 0.5,
-    "Top_depth": 2, "Bottom_depth": 5, "Length": 8
+    "Strike": 0,             # strike in degrees [0-180]
+    "Dip": -90,                # dip in degrees (usually 90 or near 90)
+    "Opening": 0.5,            # magnitude of opening (perpendincular to plane) in metres
+    "Top_depth": 2,             # depth (measured vertically) to top of dyke in kilometres
+    "Bottom_depth": 5,          # depth (measured vertically) to bottom of dyke in kilometres
+    "Length": 8                 # dyke length in kilometres
 }
 
 Sill = {
-    "Strike": 0, "Dip": 10, "Opening": 10,
-    "Depth": 5, "Width": 0.5, "Length": 1
+    "Strike": 0, "Dip": 0, "Opening": 1.4,
+    "Depth": 4.5, "Width": 1.4, "Length": 6.046
 }
 
 Mogi = {
@@ -38,7 +47,7 @@ Penny = {
 }
 
 # Satellite parameters
-values = np.arange(0, 360, 60)
+values = np.arange(0, 61, 60)
 Incidence = 5  # Incidence angle of satellite in degrees
 
 # Grid parameters

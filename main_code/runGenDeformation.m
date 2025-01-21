@@ -1,10 +1,13 @@
 % This code is for generate 'wrapped' deformation
 
 clear all
+% set(0, 'RecursionLimit', 6000);
 
 %addpath(genpath('C:\VolcanicUnrest\Atmosphere\CODE\'));
-SAVEWRAP = 0;
-outputRoot = 'G:\VolcanicUnrest\Atmosphere\synthesised_patches\';
+addpath('C:\Users\arothera\GitHub\Synthetic_InSAR_image\deform');
+
+SAVEWRAP = 1;
+outputRoot = 'C:\Users\arothera\GitHub\Synthetic_InSAR_image\set\';
 mkdir([outputRoot, 'set1\unwrap\deform\']);
 mkdir([outputRoot, 'set2\unwrap\deform\']);
 
@@ -83,9 +86,11 @@ if Source_Type == 5
                                 disp(allName);
                                 [~, los_grid] = generateDeformation(Source_Type, x, y, Quake, Dyke, Sill, Mogi, Penny, Heading, Incidence);
                                 % scaling
+                                disp("finsihed generateDeformation")
                                 los_grid = los_grid/0.028333*2*pi;
                                 los_grid = imrotate(los_grid, rotate,'crop');
                                 los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop),round(size(los_grid,2)/2) + (-halfcrop:halfcrop));
+                                disp(range(los_grid(:)));
                                 if (range(los_grid(:)) > 10)&&(range(los_grid(:)) < 30)
                                     outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'\unwrap\deform\'];
                                     save([outputDirUnwrap, allName, '.mat'], 'los_grid');
@@ -132,16 +137,19 @@ if Source_Type == 4
                     if count < maxnum
                         disp(allName);
                         [~, los_grid] = generateDeformation(Source_Type, x, y, Quake, Dyke, Sill, Mogi, Penny, Heading, Incidence);
+                        disp("done generatign deformation")
                         % scaling
                         % los_grid = los_grid/0.028333*2*pi;
                         los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop),round(size(los_grid,2)/2) + (-halfcrop:halfcrop));
                         %if (range(los_grid(:)) > 10)&&(range(los_grid(:)) < 60)
-                        if (range(los_grid(:)) > 10)&&(range(los_grid(:)) < 20)%60)
+                        disp(range(los_grid(:)))
+                        if (range(los_grid(:)) > .10)&&(range(los_grid(:)) < 20)%60)
                             outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'\unwrap\deform\'];
                             save([outputDirUnwrap, allName, '.mat'], 'los_grid');
                             if SAVEWRAP == 1
                                 outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'\wrap\deform\'];
-                                los_grid_wrap = wrapTo2Pi(los_grid)-pi;
+                                % los_grid_wrap = wrapTo2Pi(los_grid)-pi;
+                                los_grid_wrap = mod(los_grid, 2 * pi) - pi;
                                 los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/range(los_grid_wrap(:));
                                 imwrite(los_grid_wrap, [outputDirWrap, allName, '.png']);
                             end

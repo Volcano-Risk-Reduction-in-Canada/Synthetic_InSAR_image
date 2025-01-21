@@ -25,6 +25,8 @@ def intgr(r, fi, psi, h, Wt, t):
         Ur: numpy.ndarray
             Radial displacements.
     """
+    if r.ndim == 1:
+        r = r.reshape(1, -1)
     s1, s2 = r.shape
     Uz = np.zeros_like(r)
     Ur = np.zeros_like(r)

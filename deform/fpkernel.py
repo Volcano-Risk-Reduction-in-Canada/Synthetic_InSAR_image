@@ -32,9 +32,14 @@ def fpkernel(h, t, r, n):
         g = 2 * p * h * (p**2 + 6 * p * (t**2 + r**2) + 5 * (a * b)**2)
         s = ((p + z) * (p + y))**2
         s = g / s
+        if np.isscalar(t):
+            t = np.full_like(r, t)
         trbl = -4 * h / (p + t**2) * np.ones_like(t)
+        # print(trbl)
+        # print(t)
+        # print(r)
         rs = np.where(r > Dlt)
-
+        # print(rs)
         if np.all(t < Dlt):
             trbl = -4 * h / (p + r**2)
         else:

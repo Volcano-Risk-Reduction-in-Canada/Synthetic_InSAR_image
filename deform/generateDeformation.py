@@ -56,6 +56,34 @@ def generateDeformation(Source_Type, x, y, Quake, Dyke, Sill, Mogi, Penny, Headi
     else:
         raise ValueError("Error: Source_Type must be 1, 2, 3, 4, or 5")
 
+    # Calculate fault extents for visualization
+    if Source_Type in [1, 2]:
+        end1x = model[0, 0] + np.sin(model[2, 0] * DEG2RAD) * model[6, 0] / 2
+        end2x = model[0, 0] - np.sin(model[2, 0] * DEG2RAD) * model[6, 0] / 2
+        end1y = model[1, 0] + np.cos(model[2, 0] * DEG2RAD) * model[6, 0] / 2
+        end2y = model[1, 0] - np.cos(model[2, 0] * DEG2RAD) * model[6, 0] / 2
+        c1x = end1x + np.sin((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[7, 0]
+        c2x = end1x + np.sin((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[8, 0]
+        c3x = end2x + np.sin((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[8, 0]
+        c4x = end2x + np.sin((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[7, 0]
+        c1y = end1y + np.cos((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[7, 0]
+        c2y = end1y + np.cos((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[8, 0]
+        c3y = end2y + np.cos((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[8, 0]
+        c4y = end2y + np.cos((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[7, 0]
+    elif Source_Type == 3:
+        end1x = model[0, 0] + np.sin(model[2, 0] * DEG2RAD) * model[6, 0] / 2
+        end2x = model[0, 0] - np.sin(model[2, 0] * DEG2RAD) * model[6, 0] / 2
+        end1y = model[1, 0] + np.cos(model[2, 0] * DEG2RAD) * model[6, 0] / 2
+        end2y = model[1, 0] - np.cos(model[2, 0] * DEG2RAD) * model[6, 0] / 2
+        c1x = end1x + np.sin((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[9, 0]
+        c2x = end1x - np.sin((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[8, 0]
+        c3x = end2x - np.sin((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[8, 0]
+        c4x = end2x + np.sin((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[9, 0]
+        c1y = end1y + np.cos((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[9, 0]
+        c2y = end1y - np.cos((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[8, 0]
+        c3y = end2y - np.cos((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[8, 0]
+        c4y = end2y + np.cos((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[9, 0]
+
     # Set up regular grid for plots
     xx, yy = np.meshgrid(x, y)
     xx = xx.ravel()

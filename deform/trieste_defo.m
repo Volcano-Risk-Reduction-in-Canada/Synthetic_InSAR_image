@@ -39,7 +39,7 @@ clear all
 % 4 = Point Pressure Source (mogi) - Magma Chamber
 % 5 = Pressurized Penny-shaped Horizontal Crack (Fialko) - Sill
 
-Source_Type = 4;
+Source_Type = 2;
 
 
 %% Define Source Parameters

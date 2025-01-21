@@ -8,7 +8,7 @@ def fredholm(h, m, er=1e-7):
     lamda = 2 / np.pi
 
     Root, Weight = RtWt()
-    
+
     NumLegendreTerms = len(Root)
     t = np.zeros(m * NumLegendreTerms)
     Wt = np.zeros_like(t)
@@ -33,6 +33,8 @@ def fredholm(h, m, er=1e-7):
         for i in range(m * NumLegendreTerms):
             fi[i] = -t[i] + np.sum(Wt * (fi1 * fpkernel(h, t[i], t, 1) +
                                          psi1 * fpkernel(h, t[i], t, 3)))
+            # print(t)
+            # print(t[i])
             psi[i] = np.sum(Wt * (psi1 * fpkernel(h, t[i], t, 2) +
                                    fi1 * fpkernel(h, t[i], t, 4)))
 
