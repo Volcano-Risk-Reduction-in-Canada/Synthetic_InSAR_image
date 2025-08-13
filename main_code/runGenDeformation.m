@@ -20,7 +20,7 @@ end
 halfcrop = floor(227/2);
 
 % type to generate deformation
-Source_Type = 4;
+Source_Type = 1;
 
 % default
 % Source_Type = 1. %Earthquakes
@@ -63,6 +63,8 @@ maxnum = 5000;
 x=-25000:100:25000-100;
 y=-25000:100:25000-100;
 
+cmap = phase_colormap();
+
 %% Source_Type = 5. Pressurized Penny-shaped Horizontal Crack (Fialko) - Sill
 % -------------------------------------------------------------------------
 if Source_Type == 5
@@ -96,9 +98,23 @@ if Source_Type == 5
                                     save([outputDirUnwrap, allName, '.mat'], 'los_grid');
                                     if SAVEWRAP == 1
                                         outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'\wrap\deform\'];
-                                        los_grid_wrap = wrapTo2Pi(los_grid)-pi;
-                                        los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/range(los_grid_wrap(:));
-                                        imwrite(los_grid_wrap, [outputDirWrap, allName, '.png']);
+                                        los_grid_wrap = mod(los_grid, 2 * pi) - pi;
+                                        hFig = figure('visible', 'off');
+                                        imagesc(los_grid_wrap / 0.028333 * 2 * pi - pi);
+                                        colormap(cmap);
+                                        axis image;
+                                        hold on;
+                                        axis xy;
+                                        axis image;
+                                        title(['Wrapped simulation value']);
+                                        xlabel('easting (km)');
+                                        ylabel('northing (km)');
+
+                                        % Add colorbar
+                                        h = colorbar; % Create a colorbar
+                                        
+                                        ylabel(h, 'radians');
+                                        print([outputDirWrap, allName, '.png'], '-dpng', '-r300'); % Save as PNG with 300 DPI resolution
                                     end
                                     count = count + 1;
                                 end
@@ -118,7 +134,7 @@ if Source_Type == 4
         incidenceName = ['incidence',sprintf('%03d',Incidence)];
         for Heading =  5:40:330
             headingName = [incidenceName, '_heading',sprintf('%03d',Heading)];
-            for Volume = [6 6.5 6.7 7 7.2 7.5]+0.2
+            for Volume = [6 6.5 6.7 7 7.2 7.5 7.8 8.1]+0.2
                 Mogi.Volume = 10^Volume;                    %dip in degrees
                 VolumeName = [headingName, '_vol1e',sprintf('%0.1f',Volume)];
                 if Volume<=6
@@ -128,30 +144,43 @@ if Source_Type == 4
                 elseif Volume<=7
                     depth_range = [2.5 2.8 3 4 5 5.5 6];
                 else
-                    depth_range = [5 6 7 7.5 8];
+                    depth_range = [4 5 6 7 7.5 8];
                 end
                 for depth = depth_range
                     Mogi.Depth = depth;    %depth (measured vertically) to top of fault in kilometres
-                    allName = ['Type',num2str(Source_Type),VolumeName, '_depth',sprintf('%0.1f',depth)];
+                    allName = ['Type',num2str(Source_Type),'_',VolumeName, '_depth',sprintf('%0.1f',depth)];
                     
                     if count < maxnum
                         disp(allName);
                         [~, los_grid] = generateDeformation(Source_Type, x, y, Quake, Dyke, Sill, Mogi, Penny, Heading, Incidence);
-                        disp("done generatign deformation")
                         % scaling
                         % los_grid = los_grid/0.028333*2*pi;
+                        los_grid = los_grid_wrap / 0.028333 * 2 * pi - pi
                         los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop),round(size(los_grid,2)/2) + (-halfcrop:halfcrop));
                         %if (range(los_grid(:)) > 10)&&(range(los_grid(:)) < 60)
                         disp(range(los_grid(:)))
-                        if (range(los_grid(:)) > .10)&&(range(los_grid(:)) < 20)%60)
+                        if (range(los_grid(:)) > 1.0)&&(range(los_grid(:)) < 20)%60)
                             outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'\unwrap\deform\'];
                             save([outputDirUnwrap, allName, '.mat'], 'los_grid');
                             if SAVEWRAP == 1
                                 outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'\wrap\deform\'];
-                                % los_grid_wrap = wrapTo2Pi(los_grid)-pi;
                                 los_grid_wrap = mod(los_grid, 2 * pi) - pi;
-                                los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/range(los_grid_wrap(:));
-                                imwrite(los_grid_wrap, [outputDirWrap, allName, '.png']);
+                                hFig = figure('visible', 'off');
+                                imagesc(los_grid_wrap / 0.028333 * 2 * pi - pi);
+                                colormap(cmap);
+                                axis image;
+                                hold on;
+                                axis xy;
+                                axis image;
+                                title(['Wrapped simulation value']);
+                                xlabel('easting (km)');
+                                ylabel('northing (km)');
+
+                                % Add colorbar
+                                h = colorbar; % Create a colorbar
+                                
+                                ylabel(h, 'radians');
+                                print([outputDirWrap, allName, '.png'], '-dpng', '-r300'); % Save as PNG with 300 DPI resolution
                             end
                             count = count + 1;
                         end
@@ -207,9 +236,23 @@ if Source_Type == 3
                                                 save([outputDirUnwrap, allName, '.mat'], 'los_grid');
                                                 if SAVEWRAP == 1
                                                     outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'\wrap\deform\'];
-                                                    los_grid_wrap = wrapTo2Pi(los_grid)-pi;
-                                                    los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/range(los_grid_wrap(:));
-                                                    imwrite(los_grid_wrap, [outputDirWrap, allName, '.png']);
+                                                    los_grid_wrap = mod(los_grid, 2 * pi) - pi;
+                                                    hFig = figure('visible', 'off');
+                                                    imagesc(los_grid_wrap / 0.028333 * 2 * pi - pi);
+                                                    colormap(cmap);
+                                                    axis image;
+                                                    hold on;
+                                                    axis xy;
+                                                    axis image;
+                                                    title(['Wrapped simulation value']);
+                                                    xlabel('easting (km)');
+                                                    ylabel('northing (km)');
+
+                                                    % Add colorbar
+                                                    h = colorbar; % Create a colorbar
+                                                    
+                                                    ylabel(h, 'radians');
+                                                    print([outputDirWrap, allName, '.png'], '-dpng', '-r300'); % Save as PNG with 300 DPI resolution
                                                 end
                                                 count = count + 1;
                                             end
@@ -268,10 +311,24 @@ if Source_Type == 2
                                             save([outputDirUnwrap, allName, '.mat'], 'los_grid');
                                             if SAVEWRAP == 1
                                                 outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'\wrap\deform\'];
-                                                los_grid_wrap = wrapTo2Pi(los_grid)-pi;
-                                                los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/range(los_grid_wrap(:));
-                                                imwrite(los_grid_wrap, [outputDirWrap, allName, '.png']);
-                                            end
+                                                los_grid_wrap = mod(los_grid, 2 * pi) - pi;
+                                                hFig = figure('visible', 'off');
+                                                imagesc(los_grid_wrap / 0.028333 * 2 * pi - pi);
+                                                colormap(cmap);
+                                                axis image;
+                                                hold on;
+                                                axis xy;
+                                                axis image;
+                                                title(['Wrapped simulation value']);
+                                                xlabel('easting (km)');
+                                                ylabel('northing (km)');
+
+                                                % Add colorbar
+                                                h = colorbar; % Create a colorbar
+                                                
+                                                ylabel(h, 'radians');
+                                                print([outputDirWrap, allName, '.png'], '-dpng', '-r300'); % Save as PNG with 300 DPI resolution
+                                                    end
                                             count = count + 1;
                                         end
                                     end
@@ -292,7 +349,7 @@ if Source_Type == 1
     Heading = 192.04;    % Heading (azimuth) of satellite measured clockwise from North, in degrees
     Incidence = 23;
     count = 1;
-    for Strike = 0:36:360-36
+    for Strike = 108:36:360-36
         Quake.Strike = Strike;              %strike in degrees
         strikeName = ['strike',sprintf('%03d',Strike)];
         for Dip = 70:5:90
@@ -316,7 +373,7 @@ if Source_Type == 1
                             Quake.Top_depth = Top_depth;    %depth (measured vertically) to top of fault in kilometres
                             allName = ['Type',num2str(Source_Type),'_',Bottom_depthName, '_tdepth',sprintf('%1d',Top_depth)];
                             if count < maxnum
-                                %                         disp(allName);
+                                disp(allName);
                                 [~, los_grid] = generateDeformation(Source_Type, x, y, Quake, Dyke, Sill, Mogi, Penny, Heading, Incidence);
                                 % scaling
                                 los_grid = los_grid/0.028333*2*pi;
@@ -326,9 +383,23 @@ if Source_Type == 1
                                     save([outputDirUnwrap, allName, '.mat'], 'los_grid');
                                     if SAVEWRAP == 1
                                         outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'\wrap\deform\'];
-                                        los_grid_wrap = wrapTo2Pi(los_grid)-pi;
-                                        los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/range(los_grid_wrap(:));
-                                        imwrite(los_grid_wrap, [outputDirWrap, allName, '.png']);
+                                        los_grid_wrap = mod(los_grid, 2 * pi) - pi;
+                                        hFig = figure('visible', 'off');
+                                        imagesc(los_grid_wrap / 0.028333 * 2 * pi - pi);
+                                        colormap(cmap);
+                                        axis image;
+                                        hold on;
+                                        axis xy;
+                                        axis image;
+                                        title(['Wrapped simulation value']);
+                                        xlabel('easting (km)');
+                                        ylabel('northing (km)');
+
+                                        % Add colorbar
+                                        h = colorbar; % Create a colorbar
+                                        
+                                        ylabel(h, 'radians');
+                                        print([outputDirWrap, allName, '.png'], '-dpng', '-r300'); % Save as PNG with 300 DPI resolution
                                     end
                                     count = count + 1;
                                 end
