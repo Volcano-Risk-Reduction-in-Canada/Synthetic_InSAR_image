@@ -61,18 +61,45 @@ def dc3d4(alpha, x, y, dip, al1, al2, aw1, aw2, disl1, disl2):
         for j in range(2):
             xi = x - al1 if j == 0 else x - al2
 
-            # Station geometry constants
-            c2_r = np.sqrt(xi**2 + et**2 + q**2)
+            # Calculate station geometry constants with singularity handling
+            etq_max = np.maximum(np.abs(et), np.abs(q))
+            dc_max = np.maximum(np.abs(xi), etq_max)
+
+            xi = xi - (np.abs(xi / dc_max) < EPS) * xi
+            xi = xi - (np.abs(xi) < EPS) * xi
+            et = et - (np.abs(et / dc_max) < EPS) * et
+            et = et - (np.abs(et) < EPS) * et
+            q = q - (np.abs(q / dc_max) < EPS) * q
+            q = q - (np.abs(q) < EPS) * q
+
+            dc_xi = xi
+            dc_et = et
+            dc_q = q
+
+            c2_r = np.sqrt(dc_xi**2 + dc_et**2 + dc_q**2)
 
             if np.any(c2_r == F0):
                 return np.zeros(nx), np.zeros(nx), np.zeros(nx), 1
 
-            c2_y = et * c0_cd + q * c0_sd
-            c2_d = et * c0_sd - q * c0_cd
+            c2_y = dc_et * c0_cd + dc_q * c0_sd
+            c2_d = dc_et * c0_sd - dc_q * c0_cd
 
-            c2_x11 = np.ones(nx) / (c2_r * (c2_r + xi))
-            c2_ale = np.log(c2_r + et)
-            c2_y11 = np.ones(nx) / (c2_r * (c2_r + et))
+            with np.errstate(divide='ignore', invalid='ignore'):
+                c2_tt = np.arctan((dc_xi * dc_et) / (dc_q * c2_r))
+            c2_tt = np.where(dc_q == 0, F0, c2_tt)
+
+            c2_x11 = F1 / (c2_r * (c2_r + dc_xi))
+            c2_x11 = c2_x11 - ((dc_xi < F0) & (dc_q == F0) & (dc_et == F0)) * c2_x11
+
+            c2_ale_msk1 = ((dc_et < F0) & (dc_q == F0) & (dc_xi == F0)).astype(float)
+            c2_ale_msk2 = F1 - c2_ale_msk1
+            ret1 = c2_r - dc_et
+            ret2 = c2_r + dc_et
+            c2_ale = c2_ale_msk1 * (-np.log(ret1)) + c2_ale_msk2 * np.log(ret2)
+            c2_y11 = F1 / (c2_r * ret2)
+
+            if np.any(((q == F0) & (((jxi & (et == F0)) | (jet & (xi == F0)))) ) | (c2_r == F0)):
+                return np.zeros(nx), np.zeros(nx), np.zeros(nx), 2
 
             # Part B of displacement calculations
             rd = c2_r + c2_d
@@ -96,20 +123,22 @@ def dc3d4(alpha, x, y, dip, al1, al2, aw1, aw2, disl1, disl2):
             qy = q * c2_y11
 
             # Strike-slip contribution
-            if np.any(disl1) != F0:
+            if disl1 != F0:
                 du2 = np.zeros((3, nx))
-                du2[0, :] = -xi * qy - c0_alp3 * ai1 * c0_sd
+                du2[0, :] = -xi * qy - c2_tt - c0_alp3 * ai1 * c0_sd
                 du2[1, :] = -q / c2_r + c0_alp3 * c2_y / rd * c0_sd
                 du2[2, :] = q * qy - c0_alp3 * ai2 * c0_sd
-                dub += (disl1 / PI2) * du2
+                dub = (disl1 / PI2) * du2
+            else:
+                dub = np.zeros((3, nx))
 
             # Dip-slip contribution
-            if np.any(disl2) != F0:
+            if disl2 != F0:
                 du2 = np.zeros((3, nx))
                 du2[0, :] = -q / c2_r + c0_alp3 * ai3 * c0_sdcd
-                du2[1, :] = -et * qx - c0_alp3 * xi / rd * c0_sdcd
+                du2[1, :] = -et * qx - c2_tt - c0_alp3 * xi / rd * c0_sdcd
                 du2[2, :] = q * qx + c0_alp3 * ai4 * c0_sdcd
-                dub += (disl2 / PI2) * du2
+                dub = dub + (disl2 / PI2) * du2
 
             du = np.zeros((3, nx))
             du[0, :] = dub[0, :]

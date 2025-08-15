@@ -1,6 +1,6 @@
 import numpy as np
-from dc3d4 import dc3d4
-from dc3d5 import dc3d5
+from .dc3d4 import dc3d4
+from .dc3d5 import dc3d5
 
 def disloc3d3(m, x, lambda_, mu):
     """
@@ -26,13 +26,7 @@ def disloc3d3(m, x, lambda_, mu):
     nfaults = m.shape[1]
     nx = x.shape[1]
 
-    # Initialize displacement matrix
-    U = np.zeros((3, nx))
-
-    # Calculate alpha
-    alpha = (lambda_ + mu) / (lambda_ + 2 * mu)
-
-    # Loop over models
+@@ -36,55 +36,58 @@ def disloc3d3(m, x, lambda_, mu):
     for i in range(nfaults):
         # Convert model into correct inputs for dc3d4 or dc3d5
         flt_x = np.full(nx, m[0, i])
@@ -58,8 +52,8 @@ def disloc3d3(m, x, lambda_, mu):
         aw2 = np.full(nx, hmax / sindip)
 
         # Reject data which breaks the surface
-        if np.any(hmin < 0):
-            raise ValueError("ERROR: Fault top above ground surface")
+        if hmin < 0:
+            print("ERROR: Fault top above ground surface")
 
         hmin += (hmin == 0) * 1e-5
 
@@ -78,10 +72,13 @@ def disloc3d3(m, x, lambda_, mu):
             # Tensile only component solution
             ux, uy, uz, err = dc3d5(alpha, X, Y, -dip, al1, al2, aw1, aw2, 0, 0, opening)
         else:
-            raise ValueError("10th row in geometry file must be 1 (double couple) or 2 (tensile)")
+            raise ValueError(
+                "10th row in geometry file must be 1 (double couple) or 2 (tensile)"
+            )
 
         if err != 0:
-            raise RuntimeError(f"Error code in dc3d3: {err}")
+            print("error code in dc3d3... stopping!")
+            return U, err
 
         U[0, :] += ct * ux + st * uy
         U[1, :] += -st * ux + ct * uy

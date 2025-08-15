@@ -1,27 +1,29 @@
 import numpy as np
-from dc3d4 import dc3d4
-from dc3d5 import dc3d5
-from dc3d6 import dc3d6
+from .dc3d4 import dc3d4
+from .dc3d5 import dc3d5
+from .dc3d6 import dc3d6
 
 def disloc3d4(m, x, lambda_, mu):
     """
     Returns the deformation at points 'x', given dislocation model 'm'.
 
-    Parameters:
-        m: numpy.ndarray
-            Dislocation model matrix (9xj).
-        x: numpy.ndarray
-            Observation coordinates matrix (2xi).
-        lambda_: float
-            First Lame parameter.
-        mu: float
-            Second Lame parameter (shear modulus).
+    Parameters
+    ----------
+    m : numpy.ndarray
+        Dislocation model matrix (10 x j).
+    x : numpy.ndarray
+        Observation coordinates matrix (2 x i).
+    lambda_ : float
+        First Lame parameter.
+    mu : float
+        Second Lame parameter (shear modulus).
 
-    Returns:
-        U: numpy.ndarray
-            Displacements (east, north, and up components).
-        flag: int
-            Error flag (0 if no error).
+    Returns
+    -------
+    U : numpy.ndarray
+        Displacements (east, north, and up components).
+    flag : int
+        Error flag (0 if no error).
     """
     DEG2RAD = 2 * np.pi / 360
     nfaults = m.shape[1]
@@ -32,7 +34,6 @@ def disloc3d4(m, x, lambda_, mu):
 
     # Calculate alpha
     alpha = (lambda_ + mu) / (lambda_ + 2 * mu)
-    # print(f"Alpha: {alpha}")
 
     # Loop over models
     for i in range(nfaults):
@@ -61,14 +62,13 @@ def disloc3d4(m, x, lambda_, mu):
         rrake = (rake + 90) * DEG2RAD
         ud = np.full(nx, slip * np.cos(rrake))
         us = np.full(nx, -slip * np.sin(rrake))
-        print(f'us: {us}')
         opening = np.full(nx, slip)
         halflen = length / 2
         al2 = np.full(nx, halflen)
         al1 = -al2
 
-        if np.any(hmin < 0):
-            raise ValueError("ERROR: Fault top above ground surface")
+        if hmin < 0:
+            print("ERROR: Fault top above ground surface")
         
         hmin += (hmin == 0) * 1e-5  # Adjust if hmin is zero
 
@@ -86,10 +86,12 @@ def disloc3d4(m, x, lambda_, mu):
         elif m[9, i] == 3:  # Tensile only component solution, sills
             ux, uy, uz, err = dc3d6(alpha, X, Y, fdepth, -dip, al1, al2, aw1, aw2, 0, 0, opening)
         else:
-            raise ValueError("10th row in geometry file must be 1 (=double couple) or 2 (tensile)")
+            print("10th row in geometry file must be 1 (=double couple) or 2 (tensile)")
+            return U, 1
 
         if err != 0:
-            raise RuntimeError(f"Error code in dc3d3: {err}")
+            print("error code in dc3d3... stopping!")
+            return U, err
 
         U[0, :] += ct * ux + st * uy
         U[1, :] += -st * ux + ct * uy
