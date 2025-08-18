@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def Q(h, t, r, n):
     """
     Kernels calculation.
@@ -18,6 +19,9 @@ def Q(h, t, r, n):
         numpy.ndarray
             Calculated kernel values.
     """
+    t = np.asarray(t, dtype=float)
+    r = np.asarray(r, dtype=float)
+
     E = h**2 + r**2 - t**2
     D = np.sqrt(E**2 + 4 * h**2 * t**2)
     D3 = D**3
@@ -49,6 +53,6 @@ def Q(h, t, r, n):
     elif n == 61:  # Q6*r
         K = 1 - (h * np.sqrt(D + E) + t * np.sqrt(D - E)) / (D * np.sqrt(2))
     else:
-        raise ValueError("Invalid kernel type n.")
+        K = np.array([])
 
     return K
