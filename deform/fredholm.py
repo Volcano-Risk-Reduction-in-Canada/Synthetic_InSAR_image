@@ -1,6 +1,6 @@
 import numpy as np
-from fpkernel import fpkernel
-from RtWt import RtWt
+from .fpkernel import fpkernel
+from .RtWt import RtWt
 
 
 def fredholm(h, m, er=1e-7):
@@ -31,19 +31,25 @@ def fredholm(h, m, er=1e-7):
 
     while res > er:
         for i in range(m * NumLegendreTerms):
-            fi[i] = -t[i] + np.sum(Wt * (fi1 * fpkernel(h, t[i], t, 1) +
-                                         psi1 * fpkernel(h, t[i], t, 3)))
-            # print(t)
-            # print(t[i])
-            psi[i] = np.sum(Wt * (psi1 * fpkernel(h, t[i], t, 2) +
-                                   fi1 * fpkernel(h, t[i], t, 4)))
+            fi[i] = -t[i] + np.sum(
+                Wt * (fi1 * fpkernel(h, t[i], t, 1) + psi1 * fpkernel(h, t[i], t, 3))
+            )
+            psi[i] = np.sum(
+                Wt * (psi1 * fpkernel(h, t[i], t, 2) + fi1 * fpkernel(h, t[i], t, 4))
+            )
 
         fi *= lamda
         psi *= lamda
 
-        # Find maximum relative change
-        fim = np.max(np.abs(fi1 - fi)) / np.abs(fi[np.argmax(np.abs(fi1 - fi))])
-        psim = np.max(np.abs(psi1 - psi)) / np.abs(psi[np.argmax(np.abs(psi1 - psi))])
+        # find maximum relative change
+        diff_fi = np.abs(fi1 - fi)
+        im = np.argmax(diff_fi)
+        fim = diff_fi[im] / abs(fi[im])
+
+        diff_psi = np.abs(psi1 - psi)
+        im = np.argmax(diff_psi)
+        psim = diff_psi[im] / abs(psi[im])
+
         res = max(fim, psim)
 
         fi1 = fi.copy()
