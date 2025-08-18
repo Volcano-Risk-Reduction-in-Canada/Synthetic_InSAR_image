@@ -155,3 +155,4 @@ def dc3d4(alpha, x, y, dip, al1, al2, aw1, aw2, disl1, disl2):
                 u -= du
 
     return u[0, :], u[1, :], u[2, :], 0
+
