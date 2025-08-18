@@ -1,6 +1,6 @@
 import numpy as np
-from fredholm import fredholm
-from intgr import intgr
+from .fredholm import fredholm
+from .intgr import intgr
 
 def penny(mod, coord, mu, v):
     """
@@ -14,15 +14,19 @@ def penny(mod, coord, mu, v):
             P: Pressure in the crack (Pa).
         coord: numpy.ndarray
             Observation coordinates (x, y) in meters.
-        mu: float
-            Shear modulus (Pa).
-        v: float
-            Poisson's ratio.
+        mu: float, ignored
+            Shear modulus (Pa). Overridden to 3e10 Pa.
+        v: float, ignored
+            Poisson's ratio. Overridden to 0.25.
 
     Returns:
         Ux, Uy, Uz: numpy.ndarray
             Displacement components in the x, y, and z directions.
     """
+    # Use fixed material properties as in MATLAB implementation
+    mu = 3e10
+    v = 0.25
+
     R = mod[3]
     P = mod[4]
     x = coord[:, 0] / R
