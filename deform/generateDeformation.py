@@ -1,7 +1,6 @@
 import numpy as np
-from disloc3d4 import disloc3d4
-from rngchn_mogi import rngchn_mogi
-from penny import penny
+from .disloc3d4 import disloc3d4
+from .rngchn_mogi import rngchn_mogi
 
 def generateDeformation(Source_Type, x, y, Quake, Dyke, Sill, Mogi, Penny, Heading, Incidence):
     """
@@ -75,14 +74,15 @@ def generateDeformation(Source_Type, x, y, Quake, Dyke, Sill, Mogi, Penny, Headi
         end2x = model[0, 0] - np.sin(model[2, 0] * DEG2RAD) * model[6, 0] / 2
         end1y = model[1, 0] + np.cos(model[2, 0] * DEG2RAD) * model[6, 0] / 2
         end2y = model[1, 0] - np.cos(model[2, 0] * DEG2RAD) * model[6, 0] / 2
-        c1x = end1x + np.sin((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[9, 0]
-        c2x = end1x - np.sin((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[8, 0]
-        c3x = end2x - np.sin((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[8, 0]
-        c4x = end2x + np.sin((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[9, 0]
-        c1y = end1y + np.cos((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[9, 0]
-        c2y = end1y - np.cos((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[8, 0]
-        c3y = end2y - np.cos((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[8, 0]
-        c4y = end2y + np.cos((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * model[9, 0]
+        width = model[8, 0] / 2
+        c1x = end1x + np.sin((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * width
+        c2x = end1x - np.sin((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * width
+        c3x = end2x - np.sin((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * width
+        c4x = end2x + np.sin((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * width
+        c1y = end1y + np.cos((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * width
+        c2y = end1y - np.cos((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * width
+        c3y = end2y - np.cos((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * width
+        c4y = end2y + np.cos((model[2, 0] + 90) * DEG2RAD) * np.cos(model[3, 0] * DEG2RAD) * width
 
     # Set up regular grid for plots
     xx, yy = np.meshgrid(x, y)
@@ -99,11 +99,52 @@ def generateDeformation(Source_Type, x, y, Quake, Dyke, Sill, Mogi, Penny, Headi
         zgrid = U[2, :].reshape(len(y), len(x))
         los_grid = xgrid * LOS_vector[0] + ygrid * LOS_vector[1] + zgrid * LOS_vector[2]
     elif Source_Type == 4:
+        xgrid = rngchn_mogi(
+            1 / 1000,
+            1 / 1000,
+            Mogi['Depth'],
+            -Mogi['Volume'] / 1e9,
+            coords[1, :] / 1000,
+            coords[0, :] / 1000,
+            v,
+            np.tile([1.0, 0.0, 0.0], (coords.shape[1], 1)),
+        )
+        ygrid = rngchn_mogi(
+            1 / 1000,
+            1 / 1000,
+            Mogi['Depth'],
+            -Mogi['Volume'] / 1e9,
+            coords[1, :] / 1000,
+            coords[0, :] / 1000,
+            v,
+            np.tile([0.0, 1.0, 0.0], (coords.shape[1], 1)),
+        )
+        zgrid = rngchn_mogi(
+            1 / 1000,
+            1 / 1000,
+            Mogi['Depth'],
+            -Mogi['Volume'] / 1e9,
+            coords[1, :] / 1000,
+            coords[0, :] / 1000,
+            v,
+            np.tile([0.0, 0.0, 1.0], (coords.shape[1], 1)),
+        )
         los_grid = rngchn_mogi(
-            1 / 1000, 1 / 1000, Mogi['Depth'], -Mogi['Volume'] / 1e9,
-            coords[1, :] / 1000, coords[0, :] / 1000, v, np.tile(LOS_vector, (coords.shape[1], 1))
-        ).reshape(len(y), len(x))
+            1 / 1000,
+            1 / 1000,
+            Mogi['Depth'],
+            -Mogi['Volume'] / 1e9,
+            coords[1, :] / 1000,
+            coords[0, :] / 1000,
+            v,
+            np.tile(LOS_vector, (coords.shape[1], 1)),
+        )
+        xgrid = xgrid.reshape(len(y), len(x))
+        ygrid = ygrid.reshape(len(y), len(x))
+        zgrid = zgrid.reshape(len(y), len(x))
+        los_grid = los_grid.reshape(len(y), len(x))
     elif Source_Type == 5:
+        from .penny import penny
         model = [1, 1, Penny['Depth'] * 1000, Penny['Radius'] * 1000, Penny['Pressure']]
         xgrid, ygrid, zgrid = penny(model, coords.T, mu, v)
         los_grid = xgrid * LOS_vector[0] + ygrid * LOS_vector[1] + zgrid * LOS_vector[2]
