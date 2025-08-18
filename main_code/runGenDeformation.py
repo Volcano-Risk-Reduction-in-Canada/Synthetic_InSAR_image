@@ -1,28 +1,48 @@
 import os
-import numpy as np
 import sys
+import numpy as np
+import matplotlib.pyplot as plt
+from PIL import Image
+
+try:
+    from scipy.io import savemat
+except Exception:  # pragma: no cover - SciPy optional
+    savemat = None
 
 parent_dir = os.path.dirname(os.path.dirname(__file__))
 sys.path.append(parent_dir)
-sys.path.append(os.path.join(parent_dir, 'deform'))
-
 
 from deform.generateDeformation import generateDeformation
-import matplotlib.pyplot as plt
 
 # Settings
-SAVEWRAP = 0
-# outputRoot = "G:/VolcanicUnrest/Atmosphere/synthesised_patches/"
-outputRoot = "C:/Users/arothera/GitHub/Synthetic_InSAR_image/set"
-os.makedirs(f"{outputRoot}/set1/unwrap/deform/", exist_ok=True)
-os.makedirs(f"{outputRoot}/set2/unwrap/deform/", exist_ok=True)
-
+SAVEWRAP = 1
+outputRoot = r"C:/Users/arothera/GitHub/Synthetic_InSAR_image/set"
+for s in ("set1", "set2"):
+    os.makedirs(os.path.join(outputRoot, s, "unwrap", "deform"), exist_ok=True)
 if SAVEWRAP == 1:
-    os.makedirs(f"{outputRoot}/set1/wrap/deform/", exist_ok=True)
-    os.makedirs(f"{outputRoot}/set2/wrap/deform/", exist_ok=True)
+    for s in ("set1", "set2"):
+        os.makedirs(os.path.join(outputRoot, s, "wrap", "deform"), exist_ok=True)
 
 halfcrop = 227 // 2
-Source_Type = 5
+Source_Type = 4
+
+
+def center_crop(arr):
+    r, c = arr.shape
+    return arr[r // 2 - halfcrop : r // 2 + halfcrop + 1,
+               c // 2 - halfcrop : c // 2 + halfcrop + 1]
+
+
+def rotate_array(arr, angle):
+    return np.array(Image.fromarray(arr).rotate(angle, resample=Image.BILINEAR, expand=False))
+
+
+def save_unwrap(base_dir, name, data):
+    path = os.path.join(base_dir, f"{name}.mat")
+    if savemat:
+        savemat(path, {"los_grid": data})
+    else:  # fall back to NumPy binary if SciPy is unavailable
+        np.save(os.path.splitext(path)[0] + ".npy", data)
 
 # Source Parameters
 Quake = {
@@ -75,21 +95,15 @@ if Source_Type == 1:
                                 # print(allName)
                                 _, los_grid = generateDeformation(Source_Type, x, y, Quake, Dyke, Sill, Mogi, Penny, 192.04, 23)
                                 los_grid = los_grid / 0.028333 * 2 * np.pi
-                                los_grid = los_grid[len(los_grid)//2 - halfcrop:len(los_grid)//2 + halfcrop, len(los_grid)//2 - halfcrop:len(los_grid)//2 + halfcrop]
-                                print(f'Range: {np.ptp(los_grid)}')
-                                if 12 < np.ptp(los_grid) < 8000:
-                                    outputDirUnwrap = f"{outputRoot}/set{2 - count % 2}/unwrapdeform/"
-                                    print(f"outputDir: {outputDirUnwrap}")
-                                    os.makedirs(outputDirUnwrap, exist_ok=True)
-                                    plt.figure()
-                                    plt.imshow(los_grid / 0.028333 * 2 * np.pi - np.pi, extent=[x[0] / 1000, x[-1] / 1000, y[0] / 1000, y[-1] / 1000], cmap='jet')
-                                    plt.colorbar(label='radians')
-                                    # plt.title(f'Wrapped Simulation (Heading: {Heading})')
-                                    plt.xlabel('Easting (km)')
-                                    plt.ylabel('Northing (km)')
-                                    plt.axis('image')
-                                    plt.show()
-                                    np.save(f"{outputDirUnwrap}{allName}.npy", los_grid)
+                                los_grid = center_crop(los_grid)
+                                if 12 < np.ptp(los_grid) < 80:
+                                    outputDirUnwrap = os.path.join(outputRoot, f"set{2 - count % 2}", "unwrap", "deform")
+                                    save_unwrap(outputDirUnwrap, allName, los_grid)
+                                    if SAVEWRAP == 1:
+                                        outputDirWrap = os.path.join(outputRoot, f"set{2 - count % 2}", "wrap", "deform")
+                                        los_grid_wrap = np.mod(los_grid, 2 * np.pi) - np.pi
+                                        los_grid_wrap = (los_grid_wrap - los_grid_wrap.min()) / np.ptp(los_grid_wrap)
+                                        plt.imsave(os.path.join(outputDirWrap, f"{allName}.png"), los_grid_wrap, cmap="gray")
                                     count += 1
 
 # Source_Type = 2: Dykes
@@ -115,11 +129,15 @@ if Source_Type == 2:
                                         print(allName)
                                         _, los_grid = generateDeformation(Source_Type, x, y, Quake, Dyke, Sill, Mogi, Penny, Heading, Incidence)
                                         los_grid = los_grid / 0.028333 * 2 * np.pi
-                                        los_grid = los_grid[len(los_grid)//2 - halfcrop:len(los_grid)//2 + halfcrop, len(los_grid)//2 - halfcrop:len(los_grid)//2 + halfcrop]
+                                        los_grid = center_crop(los_grid)
                                         if 12 < np.ptp(los_grid) < 70:
-                                            outputDirUnwrap = f"{outputRoot}/set{2 - count % 2}/unwrap/deform/"
-                                            os.makedirs(outputDirUnwrap, exist_ok=True)
-                                            np.save(f"{outputDirUnwrap}{allName}.npy", los_grid)
+                                            outputDirUnwrap = os.path.join(outputRoot, f"set{2 - count % 2}", "unwrap", "deform")
+                                            save_unwrap(outputDirUnwrap, allName, los_grid)
+                                            if SAVEWRAP == 1:
+                                                outputDirWrap = os.path.join(outputRoot, f"set{2 - count % 2}", "wrap", "deform")
+                                                los_grid_wrap = np.mod(los_grid, 2 * np.pi) - np.pi
+                                                los_grid_wrap = (los_grid_wrap - los_grid_wrap.min()) / np.ptp(los_grid_wrap)
+                                                plt.imsave(os.path.join(outputDirWrap, f"{allName}.png"), los_grid_wrap, cmap="gray")
                                             count += 1
 
 # Source_Type = 3: Rectangular Sills
@@ -140,24 +158,30 @@ if Source_Type == 3:
                                 Sill["Width"] = Width
                                 for Depth in [4, 5, 6]:
                                     Sill["Depth"] = Depth
-                                    allName = f"Type{Source_Type}_dip{Dip}_strike{Strike}_opening{Opening}_length{Length}_width{Width}_depth{Depth}"
-                                    if count < maxnum:
-                                        print(allName)
-                                        _, los_grid = generateDeformation(Source_Type, x, y, Quake, Dyke, Sill, Mogi, Penny, Heading, Incidence)
-                                        los_grid = los_grid / 0.028333 * 2 * np.pi
-                                        los_grid = los_grid[len(los_grid)//2 - halfcrop:len(los_grid)//2 + halfcrop, len(los_grid)//2 - halfcrop:len(los_grid)//2 + halfcrop]
-                                        if 12 < np.ptp(los_grid) < 50:
-                                            outputDirUnwrap = f"{outputRoot}/set{2 - count % 2}/unwrap/deform/"
-                                            os.makedirs(outputDirUnwrap, exist_ok=True)
-                                            np.save(f"{outputDirUnwrap}{allName}.npy", los_grid)
-                                            count += 1
+                                    for Rotate in range(0, 360, 72):
+                                        allName = f"Type{Source_Type}_dip{Dip}_strike{Strike}_opening{Opening}_length{Length}_width{Width}_depth{Depth}_rotate{Rotate}"
+                                        if count < maxnum:
+                                            print(allName)
+                                            _, los_grid = generateDeformation(Source_Type, x, y, Quake, Dyke, Sill, Mogi, Penny, Heading, Incidence)
+                                            los_grid = los_grid / 0.028333 * 2 * np.pi
+                                            los_grid = rotate_array(los_grid, Rotate)
+                                            los_grid = center_crop(los_grid)
+                                            if 12 < np.ptp(los_grid) < 50:
+                                                outputDirUnwrap = os.path.join(outputRoot, f"set{2 - count % 2}", "unwrap", "deform")
+                                                save_unwrap(outputDirUnwrap, allName, los_grid)
+                                                if SAVEWRAP == 1:
+                                                    outputDirWrap = os.path.join(outputRoot, f"set{2 - count % 2}", "wrap", "deform")
+                                                    los_grid_wrap = np.mod(los_grid, 2 * np.pi) - np.pi
+                                                    los_grid_wrap = (los_grid_wrap - los_grid_wrap.min()) / np.ptp(los_grid_wrap)
+                                                    plt.imsave(os.path.join(outputDirWrap, f"{allName}.png"), los_grid_wrap, cmap="gray")
+                                                count += 1
 
 # Source_Type = 4: Magma Chamber
 if Source_Type == 4:
     count = 1
     for Incidence in [33]:
         for Heading in range(5, 331, 40):
-            for Volume in [6, 6.5, 6.7, 7, 7.2, 7.5]:
+            for Volume in [v + 0.2 for v in [6, 6.5, 6.7, 7, 7.2, 7.5]]:
                 Mogi["Volume"] = 10**Volume
                 VolumeName = f"vol1e{Volume:.1f}"
                 depth_range = (
@@ -172,12 +196,15 @@ if Source_Type == 4:
                     if count < maxnum:
                         print(allName)
                         _, los_grid = generateDeformation(Source_Type, x, y, Quake, Dyke, Sill, Mogi, Penny, Heading, Incidence)
-                        los_grid = los_grid / 0.028333 * 2 * np.pi
-                        los_grid = los_grid[len(los_grid)//2 - halfcrop:len(los_grid)//2 + halfcrop, len(los_grid)//2 - halfcrop:len(los_grid)//2 + halfcrop]
-                        if 10 < np.ptp(los_grid) < 20:
-                            outputDirUnwrap = f"{outputRoot}/set{2 - count % 2}/unwrap/deform/"
-                            os.makedirs(outputDirUnwrap, exist_ok=True)
-                            np.save(f"{outputDirUnwrap}{allName}.npy", los_grid)
+                        los_grid = center_crop(los_grid)
+                        if 0.10 < np.ptp(los_grid) < 20:
+                            outputDirUnwrap = os.path.join(outputRoot, f"set{2 - count % 2}", "unwrap", "deform")
+                            save_unwrap(outputDirUnwrap, allName, los_grid)
+                            if SAVEWRAP == 1:
+                                outputDirWrap = os.path.join(outputRoot, f"set{2 - count % 2}", "wrap", "deform")
+                                los_grid_wrap = np.mod(los_grid, 2 * np.pi) - np.pi
+                                los_grid_wrap = (los_grid_wrap - los_grid_wrap.min()) / np.ptp(los_grid_wrap)
+                                plt.imsave(os.path.join(outputDirWrap, f"{allName}.png"), los_grid_wrap, cmap="gray")
                             count += 1
 
 # Source_Type = 5: Pressurized Penny-shaped Horizontal Crack
@@ -197,10 +224,14 @@ if Source_Type == 5:
                                 print(allName)
                                 _, los_grid = generateDeformation(Source_Type, x, y, Quake, Dyke, Sill, Mogi, Penny, Heading, Incidence)
                                 los_grid = los_grid / 0.028333 * 2 * np.pi
-                                los_grid = np.rot90(los_grid, Rotate // 90)
-                                los_grid = los_grid[len(los_grid)//2 - halfcrop:len(los_grid)//2 + halfcrop, len(los_grid)//2 - halfcrop:len(los_grid)//2 + halfcrop]
+                                los_grid = rotate_array(los_grid, Rotate)
+                                los_grid = center_crop(los_grid)
                                 if 10 < np.ptp(los_grid) < 30:
-                                    outputDirUnwrap = f"{outputRoot}/set{2 - count % 2}/unwrap/deform/"
-                                    os.makedirs(outputDirUnwrap, exist_ok=True)
-                                    np.save(f"{outputDirUnwrap}{allName}.npy", los_grid)
+                                    outputDirUnwrap = os.path.join(outputRoot, f"set{2 - count % 2}", "unwrap", "deform")
+                                    save_unwrap(outputDirUnwrap, allName, los_grid)
+                                    if SAVEWRAP == 1:
+                                        outputDirWrap = os.path.join(outputRoot, f"set{2 - count % 2}", "wrap", "deform")
+                                        los_grid_wrap = np.mod(los_grid, 2 * np.pi) - np.pi
+                                        los_grid_wrap = (los_grid_wrap - los_grid_wrap.min()) / np.ptp(los_grid_wrap)
+                                        plt.imsave(os.path.join(outputDirWrap, f"{allName}.png"), los_grid_wrap, cmap="gray")
                                     count += 1
