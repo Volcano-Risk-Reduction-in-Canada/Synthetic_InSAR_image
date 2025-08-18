@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from phase_colormap import phase_colormap
-from generateDeformation import generateDeformation
+from .generateDeformation import generateDeformation
 
 # Script to produce simulated interferograms
 # Define Source Type
@@ -26,28 +25,35 @@ Quake = {
 
 Dyke = {
     "Strike": 0,             # strike in degrees [0-180]
-    "Dip": -90,                # dip in degrees (usually 90 or near 90)
-    "Opening": 0.5,            # magnitude of opening (perpendincular to plane) in metres
-    "Top_depth": 2,             # depth (measured vertically) to top of dyke in kilometres
-    "Bottom_depth": 5,          # depth (measured vertically) to bottom of dyke in kilometres
-    "Length": 8                 # dyke length in kilometres
+    "Dip": 90,               # dip in degrees (usually 90 or near 90)
+    "Opening": 0.5,          # magnitude of opening (perpendicular to plane) in metres
+    "Top_depth": 2,          # depth (measured vertically) to top of dyke in kilometres
+    "Bottom_depth": 5,       # depth (measured vertically) to bottom of dyke in kilometres
+    "Length": 8              # dyke length in kilometres
 }
 
 Sill = {
-    "Strike": 0, "Dip": 0, "Opening": 1.4,
-    "Depth": 4.5, "Width": 1.4, "Length": 6.046
+    "Strike": 0,
+    "Dip": 10,
+    "Opening": 10,
+    "Depth": 5,
+    "Width": 0.5,
+    "Length": 1,
 }
 
 Mogi = {
-    "Depth": 2.8, "Volume": 10**6.5
+    "Depth": 2.8,
+    "Volume": 10 ** 6.5,
 }
 
 Penny = {
-    "Depth": 5, "Pressure": 10**6, "Radius": 5
+    "Depth": 5,
+    "Pressure": 10 ** 6,
+    "Radius": 5,
 }
 
 # Satellite parameters
-values = np.arange(0, 61, 60)
+values = np.arange(0, 331, 60)
 Incidence = 5  # Incidence angle of satellite in degrees
 
 # Grid parameters
@@ -65,10 +71,15 @@ for Heading in values:
 
     # Plot interferograms
     plt.figure()
-    plt.imshow(los_grid_wrap / 0.028333 * 2 * np.pi - np.pi, extent=[x[0] / 1000, x[-1] / 1000, y[0] / 1000, y[-1] / 1000], cmap=phase_colormap())
-    plt.colorbar(label='radians')
-    plt.title(f'Wrapped Simulation (Heading: {Heading})')
-    plt.xlabel('Easting (km)')
-    plt.ylabel('Northing (km)')
-    plt.axis('image')
+    plt.imshow(
+        los_grid_wrap / 0.028333 * 2 * np.pi - np.pi,
+        extent=[x[0] / 1000, x[-1] / 1000, y[0] / 1000, y[-1] / 1000],
+        origin="lower",
+        cmap="jet",
+    )
+    plt.colorbar(label="radians")
+    plt.title(f"Wrapped simulation value {Heading}")
+    plt.xlabel("easting (km)")
+    plt.ylabel("northing (km)")
+    plt.axis("image")
     plt.show()
