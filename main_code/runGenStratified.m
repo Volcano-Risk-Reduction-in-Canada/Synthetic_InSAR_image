@@ -1,14 +1,13 @@
 % This code is for generate 'wrapped' stratified atmospheric delay
 
 clear all
+runConfig;
 
 SAVEWRAP = 0;
-inputRoot = '/Volumes/VolcanicUnrest/Atmosphere/stratify/volcano_2018/';
-outputRoot = '/Volumes/VolcanicUnrest/Atmosphere/synthesised_patches/';
 
 if SAVEWRAP == 1
-    mkdir([outputRoot, 'set1\wrap\stratified\']);
-    mkdir([outputRoot, 'set2\wrap\stratified\']);
+    mkdir([outputRoot, 'set1/wrap/stratified/']);
+    mkdir([outputRoot, 'set2/wrap/stratified/']);
 end
 
 % areas of volcano
@@ -18,12 +17,12 @@ volcanoList(1:2) = [];
 % parameters
 totalSamples = 10000; % total sample to generate
 imageSize = 500;      % resolution in pixels
-incidence=43.7835;
+incidence = geom_incidence;
 xref  = 115.1;
 yref  = -8.4;
 dxref = 10;
 dyref = dxref;
-wavelength = 0.055465;
+wavelength = geom_wavelength;
 m2rad = 4.*pi./wavelength;
 rad2m = (wavelength./(4.*pi));
 zen2los = 1./cos(incidence./180.*pi);

@@ -1,6 +1,5 @@
 clear all
-
-rootDir = 'G:/VolcanicUnrest/Atmosphere/synthesised_patches/';
+runConfig;
 
 % parameters
 samplesPerClass = 10000;
@@ -13,17 +12,21 @@ for setnum = 1:2
     deformList    = dir([patchDirUnwrap,'deform/*.mat']);
     turbulentList = dir([patchDirUnwrap,'turbulent/*.mat']);
     stratifiedList = dir([patchDirUnwrap,'stratified/*.mat']);
+    % use minimum available to avoid errors
+    nAvailable = min(length(deformList), length(turbulentList), length(stratifiedList));
+    nSamples = min(samplesPerClass, nAvailable);
+    if nSamples == 0, error('No data in one or more component directories.'); end
     % get shuffled index for combination
-    indDeform = randperm(length(deformList),samplesPerClass);
-    indTurbulent = randperm(length(turbulentList),samplesPerClass);
-    indStratified = randperm(length(stratifiedList),samplesPerClass);
+    indDeform = randperm(length(deformList), nSamples);
+    indTurbulent = randperm(length(turbulentList), nSamples);
+    indStratified = randperm(length(stratifiedList), nSamples);
     % output directories
     outputDirWrap = [patchDirWrap,'combine/'];
     outputDirUnwrap = [patchDirUnwrap, 'combine/'];
     mkdir(outputDirWrap);
     mkdir(outputDirUnwrap);
     % marging process
-    for k = 1:samplesPerClass
+    for k = 1:nSamples
         % get deformation
         load([patchDirUnwrap, 'deform/', deformList(indDeform(k)).name(1:end-3),'mat']);
         load([patchDirUnwrap, 'turbulent/', turbulentList(indTurbulent(k)).name(1:end-3),'mat']);
@@ -41,7 +44,9 @@ for setnum = 1:2
        
         
         insarWrap = (insarWrap-min(insarWrap(:)))/range(insarWrap(:)).*mask;
+        outputName = ['comb_', sprintf('%05d', k)];
         imwrite(insarWrap, [outputDirWrap, outputName, '.png']);
+        save([outputDirUnwrap, outputName, '.mat'], 'insarImg', 'mask');
 
     end
 end

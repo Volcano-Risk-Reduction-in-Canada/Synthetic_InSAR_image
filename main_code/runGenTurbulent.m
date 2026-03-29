@@ -1,16 +1,15 @@
 % This code is for generate turbu atmospheric delay
 
 clear all
+runConfig;
 
-addpath('..\turbulent\');
-
-outputRoot = 'G:\VolcanicUnrest\Atmosphere\synthesised_patches\';
+addpath(fullfile(fileparts(mfilename('fullpath')), '..', 'turbulent'));
 SAVEWRAP = 0;
-mkdir([outputRoot, 'set1\unwrap\turbulent\']);
-mkdir([outputRoot, 'set2\unwrap\turbulent\']);
+mkdir([outputRoot, 'set1/unwrap/turbulent/']);
+mkdir([outputRoot, 'set2/unwrap/turbulent/']);
 if SAVEWRAP == 1
-    mkdir([outputRoot, 'set1\wrap\turbulent\']);
-    mkdir([outputRoot, 'set2\wrap\turbulent\']);
+    mkdir([outputRoot, 'set1/wrap/turbulent/']);
+    mkdir([outputRoot, 'set2/wrap/turbulent/']);
 end
 % parameters
 rows = 100;
@@ -31,12 +30,12 @@ for maxvar = 7.5+[-2 -1 0 0.75 1.5]
             curTur = imresize(atm_pets(:,:,k),[imageSize imageSize]);
             curTur = curTur(round(size(curTur,1)/2) + (-halfcrop:halfcrop),round(size(curTur,2)/2) + (-halfcrop:halfcrop));
             
-            outputDir = [outputRoot, 'set', num2str(2-rem(k,2)),'\unwrap\turbulent\'];
+            outputDir = [outputRoot, 'set', num2str(2-rem(k,2)),'/unwrap/turbulent/'];
             save([outputDir, 'turb_', sprintf('%0.2f',maxvar),'_', sprintf('%0.4f',alpha), '_', sprintf('%03d', k), '.mat'],'curTur');
             if SAVEWRAP == 1
                 curTur = wrapTo2Pi(curTur)-pi;
                 curTur = (curTur-min(curTur(:)))/range(curTur(:));
-                outputDir = [outputRoot, 'set', num2str(2-rem(k,2)),'\wrap\turbulent\'];
+                outputDir = [outputRoot, 'set', num2str(2-rem(k,2)),'/wrap/turbulent/'];
                 imwrite(curTur, [outputDir, 'turb_', sprintf('%0.2f',maxvar),'_', sprintf('%0.4f',alpha), '_', sprintf('%03d', k), '.png']);
             end
         end
