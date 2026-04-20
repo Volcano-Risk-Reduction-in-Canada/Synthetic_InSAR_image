@@ -1,16 +1,15 @@
 % This code is for generate 'wrapped' deformation
 
 clear all
+runConfig;
 
-%addpath(genpath('C:\VolcanicUnrest\Atmosphere\CODE\'));
 SAVEWRAP = 0;
-outputRoot = 'G:\VolcanicUnrest\Atmosphere\synthesised_patches\';
-mkdir([outputRoot, 'set1\unwrap\deform\']);
-mkdir([outputRoot, 'set2\unwrap\deform\']);
+mkdir([outputRoot, 'set1/unwrap/deform/']);
+mkdir([outputRoot, 'set2/unwrap/deform/']);
 
 if SAVEWRAP == 1
-    mkdir([outputRoot, 'set1\wrap\deform\']);
-    mkdir([outputRoot, 'set2\wrap\deform\']);
+    mkdir([outputRoot, 'set1/wrap/deform/']);
+    mkdir([outputRoot, 'set2/wrap/deform/']);
 end
 
 % size of input of Alexnet = 227x227 pixels
@@ -57,16 +56,18 @@ Penny.Pressure = 1*1e6;         %Pressure of crack in Pa
 Penny.Radius  = 5;               %Radius of crack in km^3
 
 maxnum = 5000;
-x=-25000:100:25000-100;
-y=-25000:100:25000-100;
+x = geom_x;
+y = geom_y;
 
 %% Source_Type = 5. Pressurized Penny-shaped Horizontal Crack (Fialko) - Sill
 % -------------------------------------------------------------------------
 if Source_Type == 5
     count = 1;
-    for Incidence = [2 15 25 160 170 177]
+    if USE_RCM, incList5 = geom_Incidence_list; headList5 = geom_Heading_list;
+    else, incList5 = [2 15 25 160 170 177]; headList5 = 0:72:180; end
+    for Incidence = incList5
         incidenceName = ['incidence',sprintf('%03d',Incidence)];
-        for Heading =  0:72:180
+        for Heading = headList5
             headingName = [incidenceName, '_heading',sprintf('%03d',Heading)];
             for Radius = 4:6
                 Penny.Radius = Radius;	%depth (measured vertically) to bottom of fault in kilometres
@@ -87,10 +88,10 @@ if Source_Type == 5
                                 los_grid = imrotate(los_grid, rotate,'crop');
                                 los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop),round(size(los_grid,2)/2) + (-halfcrop:halfcrop));
                                 if (range(los_grid(:)) > 10)&&(range(los_grid(:)) < 30)
-                                    outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'\unwrap\deform\'];
+                                    outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/unwrap/deform/'];
                                     save([outputDirUnwrap, allName, '.mat'], 'los_grid');
                                     if SAVEWRAP == 1
-                                        outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'\wrap\deform\'];
+                                        outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/wrap/deform/'];
                                         los_grid_wrap = wrapTo2Pi(los_grid)-pi;
                                         los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/range(los_grid_wrap(:));
                                         imwrite(los_grid_wrap, [outputDirWrap, allName, '.png']);
@@ -109,9 +110,9 @@ end
 % -------------------------------------------------------------------------
 if Source_Type == 4
     count = 1;
-    for Incidence = 33%[3 8 12 29 45 140 170 210 330 350]
+    for Incidence = geom_Incidence_list
         incidenceName = ['incidence',sprintf('%03d',Incidence)];
-        for Heading =  5:40:330
+        for Heading = geom_Heading_list
             headingName = [incidenceName, '_heading',sprintf('%03d',Heading)];
             for Volume = [6 6.5 6.7 7 7.2 7.5]+0.2
                 Mogi.Volume = 10^Volume;                    %dip in degrees
@@ -137,10 +138,10 @@ if Source_Type == 4
                         los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop),round(size(los_grid,2)/2) + (-halfcrop:halfcrop));
                         %if (range(los_grid(:)) > 10)&&(range(los_grid(:)) < 60)
                         if (range(los_grid(:)) > 10)&&(range(los_grid(:)) < 20)%60)
-                            outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'\unwrap\deform\'];
+                            outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/unwrap/deform/'];
                             save([outputDirUnwrap, allName, '.mat'], 'los_grid');
                             if SAVEWRAP == 1
-                                outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'\wrap\deform\'];
+                                outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/wrap/deform/'];
                                 los_grid_wrap = wrapTo2Pi(los_grid)-pi;
                                 los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/range(los_grid_wrap(:));
                                 imwrite(los_grid_wrap, [outputDirWrap, allName, '.png']);
@@ -158,9 +159,11 @@ end
 % -------------------------------------------------------------------------
 if Source_Type == 3
     count = 1;
-    for Incidence = 10:72:360-36
+    if USE_RCM, incList3 = geom_Incidence_list; headList3 = geom_Heading_list;
+    else, incList3 = 10:72:360-36; headList3 = 0:72:180; end
+    for Incidence = incList3
         incidenceName = ['incidence',sprintf('%02d',Incidence)];
-        for Heading =  0:72:180
+        for Heading = headList3
             headingName = [incidenceName, '_heading',sprintf('%03d',Heading)];
             for Dip = [0 10]
                 Sill.Dip = Dip;                    %dip in degrees
@@ -195,10 +198,10 @@ if Source_Type == 3
                                             los_grid = imrotate(los_grid, rotate,'crop');
                                             los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop),round(size(los_grid,2)/2) + (-halfcrop:halfcrop));
                                             if (range(los_grid(:)) > 12)&&(range(los_grid(:)) < 50)
-                                                outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'\unwrap\deform\'];
+                                                outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/unwrap/deform/'];
                                                 save([outputDirUnwrap, allName, '.mat'], 'los_grid');
                                                 if SAVEWRAP == 1
-                                                    outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'\wrap\deform\'];
+                                                    outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/wrap/deform/'];
                                                     los_grid_wrap = wrapTo2Pi(los_grid)-pi;
                                                     los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/range(los_grid_wrap(:));
                                                     imwrite(los_grid_wrap, [outputDirWrap, allName, '.png']);
@@ -220,11 +223,12 @@ end
 %% Source_Type = 2. Dykes
 % -------------------------------------------------------------------------
 if Source_Type == 2
-    
     count = 1;
-    for Incidence = [43 50]
+    if USE_RCM, incList2 = geom_Incidence_list; headList2 = geom_Heading_list;
+    else, incList2 = [43 50]; headList2 = [0 192]; end
+    for Incidence = incList2
         incidenceName = ['incidence',sprintf('%02d',Incidence)];
-        for Heading = [0 192]
+        for Heading = headList2
             headingName = [incidenceName, '_heading',sprintf('%03d',Heading)];
             for Strike = 0:36:360-36
                 Dyke.Strike = Strike;              %strike in degrees
@@ -256,10 +260,10 @@ if Source_Type == 2
                                         los_grid = los_grid/0.028333*2*pi;
                                         los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop),round(size(los_grid,2)/2) + (-halfcrop:halfcrop));
                                         if (range(los_grid(:)) > 12)&&(range(los_grid(:)) < 70)
-                                            outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'\unwrap\deform\'];
+                                            outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/unwrap/deform/'];
                                             save([outputDirUnwrap, allName, '.mat'], 'los_grid');
                                             if SAVEWRAP == 1
-                                                outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'\wrap\deform\'];
+                                                outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/wrap/deform/'];
                                                 los_grid_wrap = wrapTo2Pi(los_grid)-pi;
                                                 los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/range(los_grid_wrap(:));
                                                 imwrite(los_grid_wrap, [outputDirWrap, allName, '.png']);
@@ -281,8 +285,8 @@ end
 %-------------------------------------------------------------------------
 if Source_Type == 1
     Quake.Slip = 1; %magnitude of slip vector in metres
-    Heading = 192.04;    % Heading (azimuth) of satellite measured clockwise from North, in degrees
-    Incidence = 23;
+    Heading = USE_RCM*geom_Heading_list(1) + ~USE_RCM*192.04;
+    Incidence = USE_RCM*geom_Incidence_list(1) + ~USE_RCM*23;
     count = 1;
     for Strike = 0:36:360-36
         Quake.Strike = Strike;              %strike in degrees
@@ -314,10 +318,10 @@ if Source_Type == 1
                                 los_grid = los_grid/0.028333*2*pi;
                                 los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop),round(size(los_grid,2)/2) + (-halfcrop:halfcrop));
                                 if (range(los_grid(:)) > 12)&&(range(los_grid(:)) < 80)
-                                    outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'\unwrap\deform\'];
+                                    outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/unwrap/deform/'];
                                     save([outputDirUnwrap, allName, '.mat'], 'los_grid');
                                     if SAVEWRAP == 1
-                                        outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'\wrap\deform\'];
+                                        outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/wrap/deform/'];
                                         los_grid_wrap = wrapTo2Pi(los_grid)-pi;
                                         los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/range(los_grid_wrap(:));
                                         imwrite(los_grid_wrap, [outputDirWrap, allName, '.png']);
