@@ -77,12 +77,22 @@ for Source_Type = 1:5
         [los_grid_wrap, los_grid] = generateDeformation(Source_Type, ...
             config.x, config.y, Quake, Dyke, Sill, Mogi, Penny, Heading, Incidence);
 
+
         wrapped_radians = los_grid_wrap / 0.028333 * 2*pi - pi;
 
-        filename = save_interferogram(config.x, config.y, wrapped_radians, source_name, ...
-            Heading, Incidence, param1, param2, config.output_folder);
+        [num_fringes, detectable, max_disp, min_disp, disp_range] = ...
+            compute_fringe_count(los_grid);
 
-        results(counter).filename = filename;
+
+        [filename_png, filename_tif, filename_mat] = save_interferogram( ...
+            config.x, config.y, wrapped_radians, config.output_folder, ...
+            source_name, Heading, Incidence, param1, param2, n);
+        
+        % Metadata
+        results(counter).filename_png = filename_png;
+        results(counter).filename_tif = filename_tif;
+        results(counter).filename_mat = filename_mat;
+
         results(counter).source_type = Source_Type;
         results(counter).source_name = source_name;
         results(counter).heading = Heading;
@@ -90,6 +100,35 @@ for Source_Type = 1:5
         results(counter).param1 = param1;
         results(counter).param2 = param2;
 
+        results(counter).max_displacement = max_disp;
+        results(counter).min_displacement = min_disp;
+        results(counter).displacement_range = disp_range;
+        results(counter).num_fringes = num_fringes;
+        results(counter).detectable = detectable;
+
+        % Source-specific metadata
+        switch Source_Type
+            case 1
+                if isfield(Quake, 'Depth'), results(counter).depth_km = Quake.Depth; end
+                if isfield(Quake, 'Slip'), results(counter).slip_m = Quake.Slip; end
+            case 2
+                results(counter).strike_deg = Dyke.Strike;
+                results(counter).dip_deg = Dyke.Dip;
+                results(counter).opening_m = Dyke.Opening;
+                results(counter).top_depth_km = Dyke.Top_depth;
+                results(counter).bottom_depth_km = Dyke.Bottom_depth;
+                results(counter).length_km = Dyke.Length;
+            case 3
+                if isfield(Sill, 'Depth'), results(counter).depth_km = Sill.Depth; end
+                if isfield(Sill, 'Radius'), results(counter).radius_km = Sill.Radius; end
+            case 4
+                if isfield(Mogi, 'Depth'), results(counter).depth_km = Mogi.Depth; end
+                if isfield(Mogi, 'Volume_Change'), results(counter).volume_change = Mogi.Volume_Change; end
+            case 5
+                if isfield(Penny, 'Depth'), results(counter).depth_km = Penny.Depth; end
+                if isfield(Penny, 'Radius'), results(counter).radius_km = Penny.Radius; end
+                if isfield(Penny, 'Pressure_Change'), results(counter).pressure_change = Penny.Pressure_Change; end
+        end
         counter = counter + 1;
     end
 end

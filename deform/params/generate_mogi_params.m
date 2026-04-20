@@ -8,10 +8,10 @@ function Mogi = generate_mogi_params(d_bin, v_bin, number_bins)
 
     % Depth of Mogi Source (2-6 km)
     Mogi.Depth = depth_bins(d_bin) + ...
-        (depth_bins(d_bin + 1) - depth_bins(d_bin)) * rand;
+        (depth_bins(d_bin + 1) - depth_bins(d_bin)) * clamped_rand();
 
     % Volume in m^3 (1e6-1e8)
     Mogi.Volume = volume_bins(v_bin) * ...
-        (volume_bins(v_bin + 1) / volume_bins(v_bin))^rand;
+        (volume_bins(v_bin + 1) / volume_bins(v_bin))^clamped_rand();
 
 end
