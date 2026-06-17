@@ -21,8 +21,8 @@ if USE_RCM
     geom_y = geom_x;
     geom_wavelength = 0.05405;
     geom_incidence = 35;
-    geom_Heading_list = 192;
-    geom_Incidence_list = 35;
+    geom_Heading_list = [192 12];           % ascending and descending orbits
+    geom_Incidence_list = [20 25 30 35 40 45 50 55];  % 5M beam modes rounded to nearest 5 deg
 else
     % Original (Sentinel-1 style) - 100 m resolution
     geom_x = -25000:100:25000-100;

@@ -14,8 +14,7 @@ end
 
 % chipSize and halfcrop come from runConfig
 
-% type to generate deformation
-Source_Type = 4;
+% type to generate deformation — loop runs all source types
 
 % default
 % Source_Type = 1. %Earthquakes
@@ -54,9 +53,11 @@ Penny.Depth  = 5;                %Depth of crack in km^3
 Penny.Pressure = 1*1e6;         %Pressure of crack in Pa
 Penny.Radius  = 5;               %Radius of crack in km^3
 
-maxnum = 5000;
+maxnum = 2000;
 x = geom_x;
 y = geom_y;
+
+for Source_Type = [5 4 3 2 1]
 
 %% Source_Type = 5. Pressurized Penny-shaped Horizontal Crack (Fialko) - Sill
 % -------------------------------------------------------------------------
@@ -68,13 +69,13 @@ if Source_Type == 5
         incidenceName = ['incidence',sprintf('%03d',Incidence)];
         for Heading = headList5
             headingName = [incidenceName, '_heading',sprintf('%03d',Heading)];
-            for Radius = 4:6
-                Penny.Radius = Radius;	%depth (measured vertically) to bottom of fault in kilometres
+            for Radius = 3:7
+                Penny.Radius = Radius;
                 RadiusName = [headingName, '_radius',sprintf('%1d',Radius)];
-                for Pressure = 6
-                    Penny.Pressure = 10^Pressure;    %depth (measured vertically) to top of fault in kilometres
-                    PressureName = [RadiusName, '_pressure',sprintf('%1d',Pressure)];
-                    for depth = [4 4.5 5]
+                for Pressure = [5.5 6 6.5]
+                    Penny.Pressure = 10^Pressure;
+                    PressureName = [RadiusName, '_pressure',sprintf('%0.1f',Pressure)];
+                    for depth = [3 4 5 6 7]
                         Penny.Depth  = depth;
                         DepthName = [PressureName, '_depth',sprintf('%0.1f',depth)];
                         for rotate = 0:72:360-72
@@ -86,7 +87,7 @@ if Source_Type == 5
                                 los_grid = los_grid/0.028333*2*pi;
                                 los_grid = imrotate(los_grid, rotate,'crop');
                                 los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop-1),round(size(los_grid,2)/2) + (-halfcrop:halfcrop-1));
-                                if ((max(los_grid(:))-min(los_grid(:))) > 10)&&((max(los_grid(:))-min(los_grid(:))) < 30)
+                                if ((max(los_grid(:))-min(los_grid(:))) > 10)&&((max(los_grid(:))-min(los_grid(:))) < 40)
                                     outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/unwrap/deform/'];
                                     save([outputDirUnwrap, allName, '.mat'], 'los_grid');
                                     if SAVEWRAP == 1
@@ -112,17 +113,19 @@ if Source_Type == 4
         incidenceName = ['incidence',sprintf('%03d',Incidence)];
         for Heading = geom_Heading_list
             headingName = [incidenceName, '_heading',sprintf('%03d',Heading)];
-            for Volume = [6 6.5 6.7 7 7.2 7.5]+0.2
-                Mogi.Volume = 10^Volume;                    %dip in degrees
+            for Volume = 5.5:0.25:8.5
+                Mogi.Volume = 10^Volume;
                 VolumeName = [headingName, '_vol1e',sprintf('%0.1f',Volume)];
                 if Volume<=6
-                    depth_range = [1.5 2];
+                    depth_range = [1.5 2 2.5];
                 elseif Volume<=6.5
-                    depth_range = [2 2.5 2.8 3];
+                    depth_range = [2 2.5 3 3.5 4];
                 elseif Volume<=7
-                    depth_range = [2.5 2.8 3 4 5 5.5 6];
+                    depth_range = [3 4 5 6 7];
+                elseif Volume<=7.5
+                    depth_range = [5 6 7 8 9];
                 else
-                    depth_range = [5 6 7 7.5 8];
+                    depth_range = [6 7 8 9 10];
                 end
                 for depth = depth_range
                     Mogi.Depth = depth;    %depth (measured vertically) to top of fault in kilometres
@@ -134,8 +137,7 @@ if Source_Type == 4
                         % scaling
                         los_grid = los_grid/0.028333*2*pi;
                         los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop-1),round(size(los_grid,2)/2) + (-halfcrop:halfcrop-1));
-                        %if ((max(los_grid(:))-min(los_grid(:))) > 10)&&((max(los_grid(:))-min(los_grid(:))) < 60)
-                        if ((max(los_grid(:))-min(los_grid(:))) > 10)&&((max(los_grid(:))-min(los_grid(:))) < 20)%60)
+                        if ((max(los_grid(:))-min(los_grid(:))) > 10)&&((max(los_grid(:))-min(los_grid(:))) < 40)
                             outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/unwrap/deform/'];
                             save([outputDirUnwrap, allName, '.mat'], 'los_grid');
                             if SAVEWRAP == 1
@@ -330,3 +332,5 @@ if Source_Type == 1
         end
     end
 end
+
+end % for Source_Type
