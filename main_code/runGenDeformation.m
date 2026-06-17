@@ -86,13 +86,13 @@ if Source_Type == 5
                                 los_grid = los_grid/0.028333*2*pi;
                                 los_grid = imrotate(los_grid, rotate,'crop');
                                 los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop-1),round(size(los_grid,2)/2) + (-halfcrop:halfcrop-1));
-                                if (range(los_grid(:)) > 10)&&(range(los_grid(:)) < 30)
+                                if ((max(los_grid(:))-min(los_grid(:))) > 10)&&((max(los_grid(:))-min(los_grid(:))) < 30)
                                     outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/unwrap/deform/'];
                                     save([outputDirUnwrap, allName, '.mat'], 'los_grid');
                                     if SAVEWRAP == 1
                                         outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/wrap/deform/'];
                                         los_grid_wrap = wrapTo2Pi(los_grid)-pi;
-                                        los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/range(los_grid_wrap(:));
+                                        los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/(max(los_grid_wrap(:))-min(los_grid_wrap(:)));
                                         imwrite(los_grid_wrap, [outputDirWrap, allName, '.png']);
                                     end
                                     count = count + 1;
@@ -135,14 +135,14 @@ if Source_Type == 4
                         % scaling
                         % los_grid = los_grid/0.028333*2*pi;
                         los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop-1),round(size(los_grid,2)/2) + (-halfcrop:halfcrop-1));
-                        %if (range(los_grid(:)) > 10)&&(range(los_grid(:)) < 60)
-                        if (range(los_grid(:)) > 10)&&(range(los_grid(:)) < 20)%60)
+                        %if ((max(los_grid(:))-min(los_grid(:))) > 10)&&((max(los_grid(:))-min(los_grid(:))) < 60)
+                        if ((max(los_grid(:))-min(los_grid(:))) > 10)&&((max(los_grid(:))-min(los_grid(:))) < 20)%60)
                             outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/unwrap/deform/'];
                             save([outputDirUnwrap, allName, '.mat'], 'los_grid');
                             if SAVEWRAP == 1
                                 outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/wrap/deform/'];
                                 los_grid_wrap = wrapTo2Pi(los_grid)-pi;
-                                los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/range(los_grid_wrap(:));
+                                los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/(max(los_grid_wrap(:))-min(los_grid_wrap(:)));
                                 imwrite(los_grid_wrap, [outputDirWrap, allName, '.png']);
                             end
                             count = count + 1;
@@ -196,13 +196,13 @@ if Source_Type == 3
                                             los_grid = los_grid/0.028333*2*pi;
                                             los_grid = imrotate(los_grid, rotate,'crop');
                                             los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop-1),round(size(los_grid,2)/2) + (-halfcrop:halfcrop-1));
-                                            if (range(los_grid(:)) > 12)&&(range(los_grid(:)) < 50)
+                                            if ((max(los_grid(:))-min(los_grid(:))) > 12)&&((max(los_grid(:))-min(los_grid(:))) < 50)
                                                 outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/unwrap/deform/'];
                                                 save([outputDirUnwrap, allName, '.mat'], 'los_grid');
                                                 if SAVEWRAP == 1
                                                     outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/wrap/deform/'];
                                                     los_grid_wrap = wrapTo2Pi(los_grid)-pi;
-                                                    los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/range(los_grid_wrap(:));
+                                                    los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/(max(los_grid_wrap(:))-min(los_grid_wrap(:)));
                                                     imwrite(los_grid_wrap, [outputDirWrap, allName, '.png']);
                                                 end
                                                 count = count + 1;
@@ -258,13 +258,13 @@ if Source_Type == 2
                                         % scaling
                                         los_grid = los_grid/0.028333*2*pi;
                                         los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop-1),round(size(los_grid,2)/2) + (-halfcrop:halfcrop-1));
-                                        if (range(los_grid(:)) > 12)&&(range(los_grid(:)) < 70)
+                                        if ((max(los_grid(:))-min(los_grid(:))) > 12)&&((max(los_grid(:))-min(los_grid(:))) < 70)
                                             outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/unwrap/deform/'];
                                             save([outputDirUnwrap, allName, '.mat'], 'los_grid');
                                             if SAVEWRAP == 1
                                                 outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/wrap/deform/'];
                                                 los_grid_wrap = wrapTo2Pi(los_grid)-pi;
-                                                los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/range(los_grid_wrap(:));
+                                                los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/(max(los_grid_wrap(:))-min(los_grid_wrap(:)));
                                                 imwrite(los_grid_wrap, [outputDirWrap, allName, '.png']);
                                             end
                                             count = count + 1;
@@ -316,13 +316,13 @@ if Source_Type == 1
                                 % scaling
                                 los_grid = los_grid/0.028333*2*pi;
                                 los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop-1),round(size(los_grid,2)/2) + (-halfcrop:halfcrop-1));
-                                if (range(los_grid(:)) > 12)&&(range(los_grid(:)) < 80)
+                                if ((max(los_grid(:))-min(los_grid(:))) > 12)&&((max(los_grid(:))-min(los_grid(:))) < 80)
                                     outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/unwrap/deform/'];
                                     save([outputDirUnwrap, allName, '.mat'], 'los_grid');
                                     if SAVEWRAP == 1
                                         outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/wrap/deform/'];
                                         los_grid_wrap = wrapTo2Pi(los_grid)-pi;
-                                        los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/range(los_grid_wrap(:));
+                                        los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/(max(los_grid_wrap(:))-min(los_grid_wrap(:)));
                                         imwrite(los_grid_wrap, [outputDirWrap, allName, '.png']);
                                     end
                                     count = count + 1;
