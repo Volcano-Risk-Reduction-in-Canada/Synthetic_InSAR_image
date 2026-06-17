@@ -37,5 +37,8 @@ end
 chipSize = 512;           % 512x512 px @ 15m = 7.68km footprint
 halfcrop = chipSize / 2;  % use as (-halfcrop:halfcrop-1) to get exactly chipSize pixels
 
+% 1 = write wrapped PNG alongside .mat; 0 = .mat only
+SAVEWRAP = 1;
+
 % Alias for combine step
 rootDir = outputRoot;

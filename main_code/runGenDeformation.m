@@ -3,7 +3,7 @@
 clear all
 runConfig;
 
-SAVEWRAP = 0;
+% SAVEWRAP comes from runConfig
 mkdir([outputRoot, 'set1/unwrap/deform/']);
 mkdir([outputRoot, 'set2/unwrap/deform/']);
 
