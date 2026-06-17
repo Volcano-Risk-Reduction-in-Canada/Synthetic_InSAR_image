@@ -12,8 +12,7 @@ if SAVEWRAP == 1
     mkdir([outputRoot, 'set2/wrap/deform/']);
 end
 
-% size of input of Alexnet = 227x227 pixels
-halfcrop = floor(227/2);
+% chipSize and halfcrop come from runConfig
 
 % type to generate deformation
 Source_Type = 4;
@@ -86,7 +85,7 @@ if Source_Type == 5
                                 % scaling
                                 los_grid = los_grid/0.028333*2*pi;
                                 los_grid = imrotate(los_grid, rotate,'crop');
-                                los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop),round(size(los_grid,2)/2) + (-halfcrop:halfcrop));
+                                los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop-1),round(size(los_grid,2)/2) + (-halfcrop:halfcrop-1));
                                 if (range(los_grid(:)) > 10)&&(range(los_grid(:)) < 30)
                                     outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/unwrap/deform/'];
                                     save([outputDirUnwrap, allName, '.mat'], 'los_grid');
@@ -135,7 +134,7 @@ if Source_Type == 4
                         [~, los_grid] = generateDeformation(Source_Type, x, y, Quake, Dyke, Sill, Mogi, Penny, Heading, Incidence);
                         % scaling
                         % los_grid = los_grid/0.028333*2*pi;
-                        los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop),round(size(los_grid,2)/2) + (-halfcrop:halfcrop));
+                        los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop-1),round(size(los_grid,2)/2) + (-halfcrop:halfcrop-1));
                         %if (range(los_grid(:)) > 10)&&(range(los_grid(:)) < 60)
                         if (range(los_grid(:)) > 10)&&(range(los_grid(:)) < 20)%60)
                             outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/unwrap/deform/'];
@@ -196,7 +195,7 @@ if Source_Type == 3
                                             % scaling
                                             los_grid = los_grid/0.028333*2*pi;
                                             los_grid = imrotate(los_grid, rotate,'crop');
-                                            los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop),round(size(los_grid,2)/2) + (-halfcrop:halfcrop));
+                                            los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop-1),round(size(los_grid,2)/2) + (-halfcrop:halfcrop-1));
                                             if (range(los_grid(:)) > 12)&&(range(los_grid(:)) < 50)
                                                 outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/unwrap/deform/'];
                                                 save([outputDirUnwrap, allName, '.mat'], 'los_grid');
@@ -258,7 +257,7 @@ if Source_Type == 2
                                         [~, los_grid] = generateDeformation(Source_Type, x, y, Quake, Dyke, Sill, Mogi, Penny, Heading, Incidence);
                                         % scaling
                                         los_grid = los_grid/0.028333*2*pi;
-                                        los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop),round(size(los_grid,2)/2) + (-halfcrop:halfcrop));
+                                        los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop-1),round(size(los_grid,2)/2) + (-halfcrop:halfcrop-1));
                                         if (range(los_grid(:)) > 12)&&(range(los_grid(:)) < 70)
                                             outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/unwrap/deform/'];
                                             save([outputDirUnwrap, allName, '.mat'], 'los_grid');
@@ -316,7 +315,7 @@ if Source_Type == 1
                                 [~, los_grid] = generateDeformation(Source_Type, x, y, Quake, Dyke, Sill, Mogi, Penny, Heading, Incidence);
                                 % scaling
                                 los_grid = los_grid/0.028333*2*pi;
-                                los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop),round(size(los_grid,2)/2) + (-halfcrop:halfcrop));
+                                los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop-1),round(size(los_grid,2)/2) + (-halfcrop:halfcrop-1));
                                 if (range(los_grid(:)) > 12)&&(range(los_grid(:)) < 80)
                                     outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/unwrap/deform/'];
                                     save([outputDirUnwrap, allName, '.mat'], 'los_grid');

@@ -12,11 +12,12 @@ inputRoot = fullfile(fileparts(mfilename('fullpath')), '..', 'gacos_data', 'volc
 SKIP_STRATIFIED = true;
 
 % ========== GEOMETRY: Set true for RCM, false for original (Sentinel-1) ==========
-USE_RCM = false;
+USE_RCM = true;
 
 if USE_RCM
-    % RCM (RADARSAT Constellation Mission) - C-band, 30 m resolution
-    geom_x = -7500:30:(7500-30);
+    % RCM 5M beam mode — 5m native, downsampled to 15m effective resolution
+    % Simulation grid: 1600x1600 pixels (~24km), center-cropped to chipSize
+    geom_x = -12000:15:(12000-15);
     geom_y = geom_x;
     geom_wavelength = 0.05405;
     geom_incidence = 35;
@@ -31,6 +32,10 @@ else
     geom_Heading_list = 5:40:330;
     geom_Incidence_list = 33;
 end
+
+% ========== CHIP SIZE (SwinV2 input; must be divisible by 32) ==========
+chipSize = 512;           % 512x512 px @ 15m = 7.68km footprint
+halfcrop = chipSize / 2;  % use as (-halfcrop:halfcrop-1) to get exactly chipSize pixels
 
 % Alias for combine step
 rootDir = outputRoot;
