@@ -92,8 +92,7 @@ if Source_Type == 5
                                     if SAVEWRAP == 1
                                         outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/wrap/deform/'];
                                         los_grid_wrap = wrapTo2Pi(los_grid)-pi;
-                                        los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/(max(los_grid_wrap(:))-min(los_grid_wrap(:)));
-                                        imwrite(los_grid_wrap, [outputDirWrap, allName, '.png']);
+                                        imwrite(applyEVPhaseColorRamp(los_grid_wrap), [outputDirWrap, allName, '.png']);
                                     end
                                     count = count + 1;
                                 end
@@ -133,7 +132,7 @@ if Source_Type == 4
                         disp(allName);
                         [~, los_grid] = generateDeformation(Source_Type, x, y, Quake, Dyke, Sill, Mogi, Penny, Heading, Incidence);
                         % scaling
-                        % los_grid = los_grid/0.028333*2*pi;
+                        los_grid = los_grid/0.028333*2*pi;
                         los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop-1),round(size(los_grid,2)/2) + (-halfcrop:halfcrop-1));
                         %if ((max(los_grid(:))-min(los_grid(:))) > 10)&&((max(los_grid(:))-min(los_grid(:))) < 60)
                         if ((max(los_grid(:))-min(los_grid(:))) > 10)&&((max(los_grid(:))-min(los_grid(:))) < 20)%60)
@@ -142,8 +141,7 @@ if Source_Type == 4
                             if SAVEWRAP == 1
                                 outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/wrap/deform/'];
                                 los_grid_wrap = wrapTo2Pi(los_grid)-pi;
-                                los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/(max(los_grid_wrap(:))-min(los_grid_wrap(:)));
-                                imwrite(los_grid_wrap, [outputDirWrap, allName, '.png']);
+                                imwrite(applyEVPhaseColorRamp(los_grid_wrap), [outputDirWrap, allName, '.png']);
                             end
                             count = count + 1;
                         end
@@ -202,8 +200,7 @@ if Source_Type == 3
                                                 if SAVEWRAP == 1
                                                     outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/wrap/deform/'];
                                                     los_grid_wrap = wrapTo2Pi(los_grid)-pi;
-                                                    los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/(max(los_grid_wrap(:))-min(los_grid_wrap(:)));
-                                                    imwrite(los_grid_wrap, [outputDirWrap, allName, '.png']);
+                                                    imwrite(applyEVPhaseColorRamp(los_grid_wrap), [outputDirWrap, allName, '.png']);
                                                 end
                                                 count = count + 1;
                                             end
@@ -264,8 +261,7 @@ if Source_Type == 2
                                             if SAVEWRAP == 1
                                                 outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/wrap/deform/'];
                                                 los_grid_wrap = wrapTo2Pi(los_grid)-pi;
-                                                los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/(max(los_grid_wrap(:))-min(los_grid_wrap(:)));
-                                                imwrite(los_grid_wrap, [outputDirWrap, allName, '.png']);
+                                                imwrite(applyEVPhaseColorRamp(los_grid_wrap), [outputDirWrap, allName, '.png']);
                                             end
                                             count = count + 1;
                                         end
@@ -322,8 +318,7 @@ if Source_Type == 1
                                     if SAVEWRAP == 1
                                         outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/wrap/deform/'];
                                         los_grid_wrap = wrapTo2Pi(los_grid)-pi;
-                                        los_grid_wrap = (los_grid_wrap-min(los_grid_wrap(:)))/(max(los_grid_wrap(:))-min(los_grid_wrap(:)));
-                                        imwrite(los_grid_wrap, [outputDirWrap, allName, '.png']);
+                                        imwrite(applyEVPhaseColorRamp(los_grid_wrap), [outputDirWrap, allName, '.png']);
                                     end
                                     count = count + 1;
                                 end
