@@ -4,12 +4,10 @@ clear all
 runConfig;
 
 % SAVEWRAP comes from runConfig
-mkdir([outputRoot, 'set1/unwrap/deform/']);
-mkdir([outputRoot, 'set2/unwrap/deform/']);
+mkdir([outputRoot, 'all/unwrap/deform/']);
 
 if SAVEWRAP == 1
-    mkdir([outputRoot, 'set1/wrap/deform/']);
-    mkdir([outputRoot, 'set2/wrap/deform/']);
+    mkdir([outputRoot, 'all/wrap/deform/']);
 end
 
 % chipSize and halfcrop come from runConfig
@@ -57,7 +55,8 @@ maxnum = 2000;
 x = geom_x;
 y = geom_y;
 
-for Source_Type = [5 4 3 2 1]
+for Source_Type = [4 3 2 1]     % Types 1-4: run immediately
+% for Source_Type = [5]         % Type 5 (Penny): uncomment to run separately — slow, ~50 hrs
 
 %% Source_Type = 5. Pressurized Penny-shaped Horizontal Crack (Fialko) - Sill
 % -------------------------------------------------------------------------
@@ -88,10 +87,10 @@ if Source_Type == 5
                                 los_grid = imrotate(los_grid, rotate,'crop');
                                 los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop-1),round(size(los_grid,2)/2) + (-halfcrop:halfcrop-1));
                                 if ((max(los_grid(:))-min(los_grid(:))) > 10)&&((max(los_grid(:))-min(los_grid(:))) < 40)
-                                    outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/unwrap/deform/'];
+                                    outputDirUnwrap = [outputRoot, 'all/unwrap/deform/'];
                                     save([outputDirUnwrap, allName, '.mat'], 'los_grid');
                                     if SAVEWRAP == 1
-                                        outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/wrap/deform/'];
+                                        outputDirWrap = [outputRoot, 'all/wrap/deform/'];
                                         los_grid_wrap = wrapTo2Pi(los_grid)-pi;
                                         imwrite(applyEVPhaseColorRamp(los_grid_wrap), [outputDirWrap, allName, '.png']);
                                     end
@@ -138,10 +137,10 @@ if Source_Type == 4
                         los_grid = los_grid/0.028333*2*pi;
                         los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop-1),round(size(los_grid,2)/2) + (-halfcrop:halfcrop-1));
                         if ((max(los_grid(:))-min(los_grid(:))) > 10)&&((max(los_grid(:))-min(los_grid(:))) < 40)
-                            outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/unwrap/deform/'];
+                            outputDirUnwrap = [outputRoot, 'all/unwrap/deform/'];
                             save([outputDirUnwrap, allName, '.mat'], 'los_grid');
                             if SAVEWRAP == 1
-                                outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/wrap/deform/'];
+                                outputDirWrap = [outputRoot, 'all/wrap/deform/'];
                                 los_grid_wrap = wrapTo2Pi(los_grid)-pi;
                                 imwrite(applyEVPhaseColorRamp(los_grid_wrap), [outputDirWrap, allName, '.png']);
                             end
@@ -197,10 +196,10 @@ if Source_Type == 3
                                             los_grid = imrotate(los_grid, rotate,'crop');
                                             los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop-1),round(size(los_grid,2)/2) + (-halfcrop:halfcrop-1));
                                             if ((max(los_grid(:))-min(los_grid(:))) > 12)&&((max(los_grid(:))-min(los_grid(:))) < 50)
-                                                outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/unwrap/deform/'];
+                                                outputDirUnwrap = [outputRoot, 'all/unwrap/deform/'];
                                                 save([outputDirUnwrap, allName, '.mat'], 'los_grid');
                                                 if SAVEWRAP == 1
-                                                    outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/wrap/deform/'];
+                                                    outputDirWrap = [outputRoot, 'all/wrap/deform/'];
                                                     los_grid_wrap = wrapTo2Pi(los_grid)-pi;
                                                     imwrite(applyEVPhaseColorRamp(los_grid_wrap), [outputDirWrap, allName, '.png']);
                                                 end
@@ -258,10 +257,10 @@ if Source_Type == 2
                                         los_grid = los_grid/0.028333*2*pi;
                                         los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop-1),round(size(los_grid,2)/2) + (-halfcrop:halfcrop-1));
                                         if ((max(los_grid(:))-min(los_grid(:))) > 12)&&((max(los_grid(:))-min(los_grid(:))) < 70)
-                                            outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/unwrap/deform/'];
+                                            outputDirUnwrap = [outputRoot, 'all/unwrap/deform/'];
                                             save([outputDirUnwrap, allName, '.mat'], 'los_grid');
                                             if SAVEWRAP == 1
-                                                outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/wrap/deform/'];
+                                                outputDirWrap = [outputRoot, 'all/wrap/deform/'];
                                                 los_grid_wrap = wrapTo2Pi(los_grid)-pi;
                                                 imwrite(applyEVPhaseColorRamp(los_grid_wrap), [outputDirWrap, allName, '.png']);
                                             end
@@ -315,10 +314,10 @@ if Source_Type == 1
                                 los_grid = los_grid/0.028333*2*pi;
                                 los_grid = los_grid(round(size(los_grid,1)/2) + (-halfcrop:halfcrop-1),round(size(los_grid,2)/2) + (-halfcrop:halfcrop-1));
                                 if ((max(los_grid(:))-min(los_grid(:))) > 12)&&((max(los_grid(:))-min(los_grid(:))) < 80)
-                                    outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/unwrap/deform/'];
+                                    outputDirUnwrap = [outputRoot, 'all/unwrap/deform/'];
                                     save([outputDirUnwrap, allName, '.mat'], 'los_grid');
                                     if SAVEWRAP == 1
-                                        outputDirWrap = [outputRoot, 'set', num2str(2-rem(count,2)),'/wrap/deform/'];
+                                        outputDirWrap = [outputRoot, 'all/wrap/deform/'];
                                         los_grid_wrap = wrapTo2Pi(los_grid)-pi;
                                         imwrite(applyEVPhaseColorRamp(los_grid_wrap), [outputDirWrap, allName, '.png']);
                                     end

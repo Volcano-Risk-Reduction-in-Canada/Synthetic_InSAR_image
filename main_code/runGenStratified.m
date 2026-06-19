@@ -5,9 +5,9 @@ runConfig;
 
 SAVEWRAP = 0;
 
+mkdir([outputRoot, 'all/unwrap/stratified/']);
 if SAVEWRAP == 1
-    mkdir([outputRoot, 'set1/wrap/stratified/']);
-    mkdir([outputRoot, 'set2/wrap/stratified/']);
+    mkdir([outputRoot, 'all/wrap/stratified/']);
 end
 
 % areas of volcano
@@ -35,9 +35,9 @@ for k = 1:length(volcanoList)
     disp([num2str(k),'/',num2str(length(volcanoList))])
     % point to target output directorty
     if SAVEWRAP == 1
-        outputDirWrap = [outputRoot, 'set', num2str(2-rem(k,2)),'/wrap/stratified/'];
+        outputDirWrap = [outputRoot, 'all/wrap/stratified/'];
     end
-    outputDirUnwrap = [outputRoot, 'set', num2str(2-rem(k,2)),'/unwrap/stratified/'];
+    outputDirUnwrap = [outputRoot, 'all/unwrap/stratified/'];
     mkdir(outputDirUnwrap);
     inputDir = [inputRoot, volcanoList(k).name,'/'];
     % get dates
